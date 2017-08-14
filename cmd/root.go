@@ -21,6 +21,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 var cfgFile string
@@ -28,7 +29,7 @@ var cfgFile string
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
-	Short: "A brief description of your application",
+	Short: "Use Backlog from the command line.",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
