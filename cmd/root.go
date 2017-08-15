@@ -51,10 +51,6 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	apiKey := viper.GetString("BACKLOG_API_KEY")
-
-	fmt.Println(apiKey)
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -73,11 +69,16 @@ func initConfig() {
 	} else {
 
 		// Search config in home directory with name ".backlog-cli" (without extension).
+		viper.SetConfigName("backlog-cli")
 		viper.AddConfigPath(".")
-		viper.SetConfigName(".backlog-cli")
 		viper.SetConfigType("yaml")
-		viper.SetEnvPrefix("backlog")
-		viper.AutomaticEnv() // read in environment variables that match
+		// viper.SetEnvPrefix("backlog")
+		// viper.AutomaticEnv() // read in environment variables that match
+
+		// If a config file is found, read it in.
+		if err := viper.ReadInConfig(); err == nil {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
 
 		key := viper.GetString("BACKLOG_API_KEY")
 		noprefixkey := viper.GetString("API_KEY")
@@ -85,10 +86,4 @@ func initConfig() {
 		fmt.Println(key)
 		fmt.Println(noprefixkey)
 	}
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
-	fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
