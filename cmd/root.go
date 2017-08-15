@@ -15,12 +15,11 @@
 package cmd
 
 import (
-"fmt"
-"os"
+	"fmt"
+	"os"
 
-homedir "github.com/mitchellh/go-homedir"
-"github.com/spf13/cobra"
-"github.com/spf13/viper"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -49,7 +48,7 @@ func Execute() {
 	}
 }
 
-func init() { 
+func init() {
 	cobra.OnInitialize(initConfig)
 
 	apiKey := viper.GetString("BACKLOG_API_KEY")
@@ -72,40 +71,24 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
 
 		// Search config in home directory with name ".backlog-cli" (without extension).
-		path:= home + "/go/src/backlog-cli"
-		viper.AddConfigPath(path)
+		viper.AddConfigPath(".")
 		viper.SetConfigName(".backlog-cli")
-		// viper.SetConfigType("yaml")
-		// viper.SetEnvPrefix("backlog")
-
-		key := viper.Get("BACKLOG_API_KEY")
-		noprefixkey := viper.Get("API_KEY")
-
-		if key != nil{
-			fmt.Println("Non empty")
-		} else {
-			fmt.Println("Empty")
-		}
-		if noprefixkey != nil {
-			fmt.Println("Non empty")
-		} else {
-			fmt.Println("Empty")
-		}
-
+		viper.SetConfigType("yaml")
+		viper.SetEnvPrefix("backlog")
 		viper.AutomaticEnv() // read in environment variables that match
+
+		key := viper.GetString("BACKLOG_API_KEY")
+		noprefixkey := viper.GetString("API_KEY")
+
+		fmt.Println(key)
+		fmt.Println(noprefixkey)
 	}
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
