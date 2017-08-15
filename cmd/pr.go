@@ -16,8 +16,8 @@ package cmd
 
 import (
 	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // prCmd represents the pr command
@@ -31,7 +31,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pr called")
+		fmt.Println("")
+		key := viper.Get("BACKLOG_API_KEY")
+		noprefixkey := viper.Get("API_KEY")
+
+		if key != nil{
+			fmt.Println("Non empty")
+		} else {
+			fmt.Println("Empty")
+		}
+		if noprefixkey != nil {
+			fmt.Println("Non empty")
+		} else {
+			fmt.Println("Empty")
+		}
 	},
 }
 

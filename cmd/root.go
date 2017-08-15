@@ -15,13 +15,12 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+"fmt"
+"os"
 
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/joho/godotenv"
+homedir "github.com/mitchellh/go-homedir"
+"github.com/spf13/cobra"
+"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -31,11 +30,11 @@ var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
 	Short: "Use Backlog from the command line.",
 	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	examples and usage of using your application. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Cobra is a CLI library for Go that empowers applications.
+	This application is a tool to generate the needed files
+	to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -52,6 +51,10 @@ func Execute() {
 
 func init() { 
 	cobra.OnInitialize(initConfig)
+
+	apiKey := viper.GetString("BACKLOG_API_KEY")
+
+	fmt.Println(apiKey)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -77,14 +80,32 @@ func initConfig() {
 		}
 
 		// Search config in home directory with name ".backlog-cli" (without extension).
-		viper.AddConfigPath(home)
+		path:= home + "/go/src/backlog-cli"
+		viper.AddConfigPath(path)
 		viper.SetConfigName(".backlog-cli")
-	}
+		// viper.SetConfigType("yaml")
+		// viper.SetEnvPrefix("backlog")
 
-	viper.AutomaticEnv() // read in environment variables that match
+		key := viper.Get("BACKLOG_API_KEY")
+		noprefixkey := viper.Get("API_KEY")
+
+		if key != nil{
+			fmt.Println("Non empty")
+		} else {
+			fmt.Println("Empty")
+		}
+		if noprefixkey != nil {
+			fmt.Println("Non empty")
+		} else {
+			fmt.Println("Empty")
+		}
+
+		viper.AutomaticEnv() // read in environment variables that match
+	}
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
