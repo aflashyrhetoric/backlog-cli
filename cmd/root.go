@@ -47,29 +47,34 @@ func init() {
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	// BACKLOG_API_KEY
-	key := viper.GetString("BACKLOG_API_KEY")
-	RootCmd.PersistentFlags().StringVar(&cfgFile, key, "", "The Backlog API Key.")
+	key := viper.GetString("API_KEY")
+	fmt.Println(key)
+	RootCmd.PersistentFlags().StringVarP(&cfgFile, key, "k", "", "The Backlog API Key.")
 
-	fmt.Println(RootCmd.PersistentFlags().Lookup(key))
+	// fmt.Println(RootCmd.PersistentFlags().Lookup(key))
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
+		fmt.Println("Config found. Loading...")
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
+		fmt.Println("Config not found. Setting defaults...")
 
 		// Search config in home directory with name ".backlog-cli" (without extension).
-		viper.SetConfigName("backlog-cli")
+		viper.SetConfigName(".backlog-cli")
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
 		// viper.SetEnvPrefix("backlog")
-		// viper.AutomaticEnv() // read in environment variables that match
+		viper.AutomaticEnv() // read in environment variables that match
 
 		// If a config file is found, read it in.
 		if err := viper.ReadInConfig(); err == nil {
 			fmt.Println("Using config file:", viper.ConfigFileUsed())
 		}
+		// key := viper.GetString("API_KEY")
+		// fmt.Println(key)
 	}
 }
