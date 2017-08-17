@@ -9,6 +9,7 @@ import (
 )
 
 var cfgFile string
+var apiKey string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -40,16 +41,13 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.backlog-cli.yaml)")
+	// RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.backlog-cli.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	// BACKLOG_API_KEY
-	key := viper.GetString("API_KEY")
-	fmt.Println(key)
-	RootCmd.PersistentFlags().StringVarP(&cfgFile, key, "k", "", "The Backlog API Key.")
+
 
 	// fmt.Println(RootCmd.PersistentFlags().Lookup(key))
 }
@@ -72,9 +70,7 @@ func initConfig() {
 
 		// If a config file is found, read it in.
 		if err := viper.ReadInConfig(); err == nil {
-			fmt.Println("Using config file:", viper.ConfigFileUsed())
+			// fmt.Println("Using config file:", viper.ConfigFileUsed())
 		}
-		// key := viper.GetString("API_KEY")
-		// fmt.Println(key)
 	}
 }
