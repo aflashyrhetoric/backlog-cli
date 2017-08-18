@@ -74,3 +74,12 @@ func initConfig() {
 		}
 	}
 }
+
+// Endpoint returns an endpoint
+func Endpoint(apiUrl string) string {
+	baseURL:= viper.GetString("API_KEY") 
+	key:= "?apiKey=" + viper.GetString("API_KEY") 
+	endpoint := baseURL + apiUrl + key 
+	return endpoint
+}
+

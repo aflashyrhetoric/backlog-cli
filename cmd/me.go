@@ -2,12 +2,18 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
+	// "net/url"
+	// "encoding/json"
+	"io/ioutil"
+	// "strings"
 
 	"github.com/spf13/cobra"
-	"github.com/dghubble/sling"
+	// "github.com/spf13/viper"
 )
 
-// meCmd represents the me command
+var httpClient *http.Client
+
 var meCmd = &cobra.Command{
 	Use:   "me",
 	Short: "A brief description of your command",
@@ -19,15 +25,18 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		baseurl:= viper.GetString("API_KEY")
-		url:= "/api/v2/users/myself"
-		key:= '?apiKey=' + viper.GetString("API_KEY") 
-		endpoint := baseurl + url + key +
+		apiUrl:= "/api/v2/users/myself"
+		endpoint:= Endpoint(apiUrl)
 
-		params := &Params{Count: 5}
+		resp, err := http.Get(endpoint)
+		if err != nil {
+			fmt.Println("There's been a fatal error.")
+		}
+		
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
 
-		req, err := sling.New().Get(endpoint).QueryStruct().Request()
-		client.Do(req)
+		fmt.Println(body)
 	},
 }
 
