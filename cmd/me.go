@@ -3,9 +3,7 @@ package cmd
 import (
 "fmt"
 "net/http"
-
 "github.com/spf13/cobra"
-"github.com/spf13/viper"
 )
 
 var httpClient *http.Client
@@ -26,7 +24,4 @@ var meCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(meCmd)
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
 }
