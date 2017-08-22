@@ -46,19 +46,17 @@ func initConfig() {
 
 		// read in environment variables that match
 		viper.AutomaticEnv() 
-	}
-}
 
-func Prep() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 	}
 }
 
 // Endpoint returns an endpoint
 func Endpoint(apiUrl string) string {
-	baseURL:= viper.GetString("API_KEY") 
+	baseURL:= viper.GetString("BASE_URL") 
 	key:= "?apiKey=" + viper.GetString("API_KEY") 
 	endpoint := baseURL + apiUrl + key 
 	return endpoint

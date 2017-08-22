@@ -26,5 +26,7 @@ var meCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(meCmd)
-	RootCmd.Prep()
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 }
