@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/spf13/cobra"
-	git "gopkg.in/libgit2/git2go.v25"
+  "github.com/libgit2/git2go"
+
 )
 
 var httpClient *http.Client
