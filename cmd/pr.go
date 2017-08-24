@@ -3,7 +3,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 // prCmd represents the pr command
@@ -17,22 +18,32 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		key := viper.GetString("API_KEY")
-		fmt.Println(key)
+
+		repo, err := git.PlainOpen("/Users/yen-chiehchen/workspace/src/bowery-golang_demo")
+		if err != nil {
+			fmt.Printf("#%v", err)
+			panic(err)
+		}
+
+		branches, err := repo.Branches()
+		if err != nil {
+			panic(err)
+		}
+
+		err = branches.ForEach(referrals)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(prCmd)
-	viper.AutomaticEnv() // read in environment variables that match
+}
 
-	// Here you will define your flags and configuration settings.
+func referrals(refer *plumbing.Reference) error {
+	fmt.Printf("%#v\n", refer)
+	fmt.Printf("%s\n", refer.Name())
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// prCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// prCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	return nil
 }
