@@ -53,7 +53,6 @@ func initConfig() {
 	}
 }
 
-
 // Endpoint returns an endpoint
 func Endpoint(apiUrl string) string {
 	baseURL:= viper.GetString("BASE_URL") 
