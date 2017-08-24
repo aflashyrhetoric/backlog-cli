@@ -21,7 +21,7 @@ var meCmd = &cobra.Command{
 		endpoint:= Endpoint(apiUrl)
 
 		fmt.Println(endpoint)
-		fmt.Println(git.Name())
+		fmt.Println(git2go.Name())
 	},
 }
 
