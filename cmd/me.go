@@ -1,11 +1,14 @@
 package cmd
 
 import (
-	"fmt"
-	"net/http"
-	"github.com/spf13/cobra"
-  "github.com/libgit2/git2go"
+"fmt"
+"net/http"
+"github.com/spf13/cobra"
+// "github.com/libgit2/git2go"
 
+"io/ioutil"
+"log"
+"os"
 )
 
 var httpClient *http.Client
@@ -20,8 +23,21 @@ var meCmd = &cobra.Command{
 		apiUrl:= "/api/v2/users/myself"
 		endpoint:= Endpoint(apiUrl)
 
-		fmt.Println(endpoint)
-		fmt.Println(git2go.Name())
+		response, err := http.Get(endpoint);
+		if err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}	
+
+		responseData, err := ioutil.ReadAll(response.Body)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(responseData))
+
+
+
 	},
 }
 
