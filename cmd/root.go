@@ -1,11 +1,13 @@
 package cmd
 
 import (
-"fmt"
-"os"
-
-"github.com/spf13/cobra"
-"github.com/spf13/viper"
+	"fmt"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 )
 
 var cfgFile string
@@ -15,7 +17,7 @@ var apiKey string
 var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
 	Short: "Use Backlog from the command line.",
-	Long: `to quickly create a Cobra application.`,
+	Long:  `to quickly create a Cobra application.`,
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
@@ -45,7 +47,7 @@ func initConfig() {
 		// viper.SetEnvPrefix("backlog")
 
 		// read in environment variables that match
-		viper.AutomaticEnv() 
+		viper.AutomaticEnv()
 		// If a config file is found, read it in.
 		if err := viper.ReadInConfig(); err == nil {
 			fmt.Println("Using config file:", viper.ConfigFileUsed())
@@ -55,9 +57,24 @@ func initConfig() {
 
 // Endpoint returns an endpoint
 func Endpoint(apiUrl string) string {
-	baseURL:= viper.GetString("BASE_URL") 
-	key:= "?apiKey=" + viper.GetString("API_KEY") 
-	endpoint := baseURL + apiUrl + key 
+	baseURL := viper.GetString("BASE_URL")
+	key := "?apiKey=" + viper.GetString("API_KEY")
+	endpoint := baseURL + apiUrl + key
 	return endpoint
 }
 
+func get(endpoint string) []byte {
+	// func get(endpoint) string {
+	response, err := http.Get(endpoint)
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	// Response
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return responseData
+}

@@ -4,10 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
 )
 
 var httpClient *http.Client
@@ -23,19 +20,7 @@ var meCmd = &cobra.Command{
 		endpoint := Endpoint(apiUrl)
 
 		// Fetch
-		response, err := http.Get(endpoint)
-
-		if err != nil {
-			fmt.Print(err.Error())
-			os.Exit(1)
-		}
-
-		// Response
-		responseData, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(string(responseData))
+		responseData := get(endpoint)
 
 		// A Response struct to map the Entire Response
 		type User struct {
