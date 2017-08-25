@@ -11,7 +11,9 @@ import (
 )
 
 var cfgFile string
-var apiKey string
+var path string = "/Users/wdkevo/Nulab/cacoo-blog"
+
+//var apiKey string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{

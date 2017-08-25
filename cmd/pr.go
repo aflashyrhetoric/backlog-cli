@@ -11,20 +11,13 @@ import (
 var prCmd = &cobra.Command{
 	Use:   "pr",
 	Short: "Creates a Backlog Pull Request for the current branch",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `abc`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		repo, err := git.PlainOpen("/Users/wdkevo/Nulab/cacoo-blog")
+		repo, err := git.PlainOpen(path)
 		if err != nil {
 			fmt.Printf("#%v", err)
 			panic(err)
 		}
-
 		branches, err := repo.Branches()
 		if err != nil {
 			panic(err)
@@ -42,8 +35,9 @@ func init() {
 }
 
 func referrals(refer *plumbing.Reference) error {
-	fmt.Printf("%#v\n", refer)
+	//fmt.Printf("%#v\n", refer)
 	fmt.Printf("%s\n", refer.Name())
+
 
 	return nil
 }
