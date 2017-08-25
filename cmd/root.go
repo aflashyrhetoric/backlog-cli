@@ -13,8 +13,6 @@ import (
 var cfgFile string
 var path string = "/Users/wdkevo/Nulab/cacoo-blog"
 
-//var apiKey string
-
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
@@ -34,6 +32,16 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+}
+
+// FIXME: Temporary getter for Project Key
+func ProjectKey() string {
+	return viper.GetString("PROJECT_KEY")
+}
+
+// FIXME: Temporary getter for repository name
+func Repo() string {
+	return viper.GetString("REPOSITORY_NAME")
 }
 
 func initConfig() {

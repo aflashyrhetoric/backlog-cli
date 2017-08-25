@@ -16,7 +16,7 @@ var meCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		apiUrl := "/api/v2/users/myself"
+		apiUrl := "users/myself"
 		endpoint := Endpoint(apiUrl)
 
 		// Fetch
@@ -29,11 +29,11 @@ var meCmd = &cobra.Command{
 			Username string `json:"nulabAccount.uniqueId"`
 		}
 
-		var responseObject User
+		var returnedUser User
 
-		json.Unmarshal(responseData, &responseObject)
-		fmt.Println(responseObject.Name)
-		fmt.Println(responseObject.Email)
+		json.Unmarshal(responseData, &returnedUser)
+		fmt.Println(returnedUser.Name)
+		fmt.Println(returnedUser.Email)
 	},
 }
 

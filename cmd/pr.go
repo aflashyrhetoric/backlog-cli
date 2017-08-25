@@ -13,7 +13,22 @@ var prCmd = &cobra.Command{
 	Short: "Creates a Backlog Pull Request for the current branch",
 	Long:  `abc`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		p := ProjectKey()
+		r := Repo()
+
+		// FIXME: Temporary way to build up api endpoint url
+		apiUrl := "projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		endpoint := Endpoint(apiUrl)
+
+		// Fetch
+		responseData := get(endpoint)
+
+		// TODO: Add struct to map out JSON response for PR
+		// TODO: Unmarshal and populate JSON properly
+
 		repo, err := git.PlainOpen(path)
+
 		if err != nil {
 			fmt.Printf("#%v", err)
 			panic(err)
