@@ -23,7 +23,7 @@ var prCmd = &cobra.Command{
 			panic(err)
 		}
 
-		err = branches.ForEach(referrals)
+		err = branches.ForEach(reference)
 		if err != nil {
 			panic(err)
 		}
@@ -34,10 +34,8 @@ func init() {
 	RootCmd.AddCommand(prCmd)
 }
 
-func referrals(refer *plumbing.Reference) error {
+func reference(refer *plumbing.Reference) error {
 	//fmt.Printf("%#v\n", refer)
 	fmt.Printf("%s\n", refer.Name())
-
-
 	return nil
 }
