@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/spf13/cobra"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-// prCmd represents the pr command
+// Gets
 var prCmd = &cobra.Command{
 	Use:   "pr",
 	Short: "Creates a Backlog Pull Request for the current branch",
@@ -18,7 +19,7 @@ var prCmd = &cobra.Command{
 		r := Repo()
 
 		// FIXME: Temporary way to build up api endpoint url
-		apiUrl := "projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		apiUrl := "projects/" + p + "/git/repositories/" + r + "/pullRequests/count"
 		endpoint := Endpoint(apiUrl)
 
 		// Fetch
@@ -26,6 +27,16 @@ var prCmd = &cobra.Command{
 
 		// TODO: Add struct to map out JSON response for PR
 		// TODO: Unmarshal and populate JSON properly
+
+		// A Response struct to map the Entire Response
+		type PullRequest struct {
+			Count int8 `json:"count"`
+		}
+
+		var returnedPullRequestCount PullRequest
+
+		json.Unmarshal(responseData, &returnedPullRequestCount)
+		fmt.Println(returnedPullRequestCount.Count)
 
 		repo, err := git.PlainOpen(path)
 
@@ -51,6 +62,6 @@ func init() {
 
 func reference(refer *plumbing.Reference) error {
 	//fmt.Printf("%#v\n", refer)
-	fmt.Printf("%s\n", refer.Name())
+	//fmt.Printf("%s\n", refer.Count)
 	return nil
 }
