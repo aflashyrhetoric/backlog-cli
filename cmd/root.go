@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	//"net/url"
 	"net/url"
 	"os"
 	"strings"
@@ -117,4 +116,21 @@ func post(endpoint string, form url.Values) []byte {
 
 func printResponse(responseData []byte) {
 	fmt.Println(string(responseData[:]))
+}
+
+func errorCheck(err error) {
+	if err != nil {
+		fmt.Printf("#%v", err)
+		panic(err)
+	}
+}
+
+func currentBranch(path string) string {
+	repo, err := git.PlainOpen(path)
+	errorCheck(err)
+
+	branchName, err := repo.Head().Name()[11:]
+	errorCheck(err)
+
+	return branchName
 }

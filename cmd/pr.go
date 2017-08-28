@@ -14,12 +14,15 @@ import (
 var prCmd = &cobra.Command{
 	Use:   "pr",
 	Short: "Creates a Backlog Pull Request for the current branch",
-	Long:  `abc`,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------
-		i := "CACOO-11747"
-		apiUrl := "issues/" + i
+
+		// By default, get Issue ID from current branch name if possible
+		issueId := currentBranch(path)
+
+		apiUrl := "issues/" + issueId
 		endpoint := Endpoint(apiUrl)
 		type Issue struct {
 			Id int `json:"id"`
@@ -27,15 +30,18 @@ var prCmd = &cobra.Command{
 		responseData := get(endpoint)
 		var currentIssue Issue
 		json.Unmarshal(responseData, &currentIssue)
+		// Convert integer -> string for use in later functions
 		issueId := strconv.Itoa(currentIssue.Id)
 
 		fmt.Println(issueId)
 
+		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
-		p := ProjectKey()
-		r := Repo()
+		//p := ProjectKey()
+		//r := Repo()
+		//apiUrl = "projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		apiUrl = "projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		apiUrl = "test"
 		endpoint = Endpoint(apiUrl)
 
 		// Build out Form
@@ -56,31 +62,14 @@ var prCmd = &cobra.Command{
 			Branch      string `json:"branch"`
 			Id          int    `json:"id"`
 		}
-
 		var returnedPullRequestCount PullRequest
-
 		json.Unmarshal(responseData, &returnedPullRequestCount)
-
 		printResponse(responseData)
 
-		// Failure
 		fmt.Println(returnedPullRequestCount.Summary)
 
-		repo, err := git.PlainOpen(path)
-
-		if err != nil {
-			fmt.Printf("#%v", err)
-			panic(err)
-		}
-		branches, err := repo.Branches()
-		if err != nil {
-			panic(err)
-		}
-
-		err = branches.ForEach(reference)
-		if err != nil {
-			panic(err)
-		}
+		//err = branches.ForEach(reference)
+		//errorCheck(err)
 	},
 }
 
@@ -90,6 +79,6 @@ func init() {
 
 func reference(refer *plumbing.Reference) error {
 	//fmt.Printf("%#v\n", refer)
-	//fmt.Printf("%s\n", refer.Name())
+	fmt.Printf("%s\n", refer.Name()[11:])
 	return nil
 }
