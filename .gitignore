@@ -2,3 +2,4 @@
 env
 .backlog-cli.*
 node_modules/
+.idea/*
