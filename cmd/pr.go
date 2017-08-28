@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"net/url"
+	"strconv"
 )
 
 // Gets
@@ -15,28 +17,54 @@ var prCmd = &cobra.Command{
 	Long:  `abc`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// ---------------------------------------------------------
+		i := "CACOO-11747"
+		apiUrl := "issues/" + i
+		endpoint := Endpoint(apiUrl)
+		type Issue struct {
+			Id int `json:"id"`
+		}
+		responseData := get(endpoint)
+		var currentIssue Issue
+		json.Unmarshal(responseData, &currentIssue)
+		issueId := strconv.Itoa(currentIssue.Id)
+
+		fmt.Println(issueId)
+
+		// ---------------------------------------------------------
 		p := ProjectKey()
 		r := Repo()
 
-		// FIXME: Temporary way to build up api endpoint url
-		apiUrl := "projects/" + p + "/git/repositories/" + r + "/pullRequests/count"
-		endpoint := Endpoint(apiUrl)
+		apiUrl = "projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		endpoint = Endpoint(apiUrl)
 
-		// Fetch
-		responseData := get(endpoint)
+		// Build out Form
+		form := url.Values{}
+		form.Add("summary", "Test summary")
+		form.Add("description", "Test description")
+		form.Add("base", "master")
+		form.Add("branch", "test")
+		form.Add("issueId", string(issueId))
 
-		// TODO: Add struct to map out JSON response for PR
-		// TODO: Unmarshal and populate JSON properly
+		responseData = post(endpoint, form)
 
 		// A Response struct to map the Entire Response
 		type PullRequest struct {
-			Count int8 `json:"count"`
+			Summary     string `json:"summary"`
+			Description string `json:"description"`
+			Base        string `json:"base"`
+			Branch      string `json:"branch"`
+			Id          int    `json:"id"`
 		}
 
 		var returnedPullRequestCount PullRequest
 
 		json.Unmarshal(responseData, &returnedPullRequestCount)
-		fmt.Println(returnedPullRequestCount.Count)
+
+		printResponse(responseData)
+
+		// Failure
+		fmt.Println(returnedPullRequestCount.Summary)
 
 		repo, err := git.PlainOpen(path)
 
@@ -62,6 +90,6 @@ func init() {
 
 func reference(refer *plumbing.Reference) error {
 	//fmt.Printf("%#v\n", refer)
-	//fmt.Printf("%s\n", refer.Count)
+	//fmt.Printf("%s\n", refer.Name())
 	return nil
 }
