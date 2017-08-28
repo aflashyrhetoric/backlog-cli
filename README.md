@@ -4,7 +4,7 @@ A CLI tool to interact with [Backlog](backlogtool.com), a project management too
 
 ## Developer Installation
 
-1. `backlog-cli` requires `libgit2`. Install it per directions [here](https://github.com/libgit2/libgit2).
+1. To be honest, I have no idea how to install this project so just do whatever you want
 
 ## Installation
 
