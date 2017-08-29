@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"log"
+	git "gopkg.in/src-d/go-git.v4"
+	//"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
-	"net/url"
 	"os"
-	"strings"
 )
 
 var cfgFile string
@@ -69,51 +67,6 @@ func initConfig() {
 	}
 }
 
-// Endpoint returns an endpoint
-func Endpoint(apiUrl string) string {
-	baseURL := viper.GetString("BASE_URL")
-	key := "?apiKey=" + viper.GetString("API_KEY")
-	endpoint := baseURL + apiUrl + key
-	return endpoint
-}
-
-func get(endpoint string) []byte {
-	// func get(endpoint) string {
-	response, err := http.Get(endpoint)
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
-	}
-
-	// Response
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return responseData
-}
-
-func post(endpoint string, form url.Values) []byte {
-	req, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
-	req.PostForm = form
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	//fmt.Printf("form was %v", form)
-	//fmt.Println(endpoint)
-
-	// Fetch
-	response, err := hc.Do(req)
-	if err != nil {
-		panic(err)
-	}
-
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return responseData
-}
-
 func printResponse(responseData []byte) {
 	fmt.Println(string(responseData[:]))
 }
@@ -129,8 +82,9 @@ func currentBranch(path string) string {
 	repo, err := git.PlainOpen(path)
 	errorCheck(err)
 
-	branchName, err := repo.Head().Name()[11:]
+	branchName, err := repo.Head()
+	currentBranchName := branchName.Name()[11:]
 	errorCheck(err)
 
-	return branchName
+	return string(currentBranchName)
 }

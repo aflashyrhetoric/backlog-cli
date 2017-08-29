@@ -1,13 +1,11 @@
 package cmd
 
 import (
+	"backlog-cli/utils"
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/cobra"
-	"net/http"
 )
-
-var httpClient *http.Client
 
 var meCmd = &cobra.Command{
 	Use:   "me",
@@ -17,10 +15,10 @@ var meCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		apiUrl := "users/myself"
-		endpoint := Endpoint(apiUrl)
+		endpoint := utils.Endpoint(apiUrl)
 
 		// Fetch
-		responseData := get(endpoint)
+		responseData := utils.Get(endpoint)
 
 		// A Response struct to map the Entire Response
 		type User struct {
