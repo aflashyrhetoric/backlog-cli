@@ -62,7 +62,7 @@ var prCmd = &cobra.Command{
 		form.Add("summary", "Test summary")
 		form.Add("description", "Test description")
 		form.Add("base", "master")
-		form.Add("branch", "test")
+		form.Add("branch", currentBranch)
 		form.Add("issueId", issueId)
 
 		responseData = utils.Post(endpoint, form)

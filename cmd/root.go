@@ -12,7 +12,7 @@ import (
 
 var cfgFile string
 var hc = http.Client{}
-var path string = "/Users/wdkevo/Nulab/cacoo-blog"
+var path string = "/Users/wdkevo/go/src/backlogtool.com/BLGTEST/testrepo"
 var formContentType string = "Content-Type:application/x-www-form-urlencoded"
 
 // RootCmd represents the base command when called without any subcommands
