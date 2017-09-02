@@ -37,6 +37,7 @@ var prCmd = &cobra.Command{
 		}
 
 		endpoint := utils.Endpoint(apiUrl)
+    fmt.Println(endpoint)
 		type Issue struct {
 			Id int `json:"id"`
 		}
