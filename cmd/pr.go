@@ -4,6 +4,7 @@ import (
 	"backlog-cli/utils"
 	"encoding/json"
 	"fmt"
+
 	"github.com/spf13/cobra"
 	//"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/url"
@@ -37,7 +38,7 @@ var prCmd = &cobra.Command{
 		}
 
 		endpoint := utils.Endpoint(apiUrl)
-    fmt.Println(endpoint)
+		fmt.Println(endpoint)
 		type Issue struct {
 			Id int `json:"id"`
 		}

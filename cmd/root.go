@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	git "gopkg.in/src-d/go-git.v4"
@@ -67,6 +68,14 @@ func initConfig() {
 // Prints out a []byte response
 func printResponse(responseData []byte) {
 	fmt.Println(string(responseData[:]))
+}
+
+// Endpoint returns an endpoint
+func Endpoint(apiURL string) string {
+	baseURL := viper.GetString("BASE_URL")
+	key := "?apiKey=" + viper.GetString("API_KEY")
+	endpoint := baseURL + apiURL + key
+	return endpoint
 }
 
 // Checks for errors

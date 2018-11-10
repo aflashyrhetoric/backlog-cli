@@ -1,6 +1,7 @@
 .env
 env
 .backlog-cli.*
+backlog-cli
 node_modules/
 .idea/*
 *.swp
