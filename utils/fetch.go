@@ -2,23 +2,24 @@ package utils
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 var cfgFile string
 var hc = http.Client{}
 
 // Endpoint returns an endpoint
-func Endpoint(apiUrl string) string {
+func Endpoint(apiURL string) string {
 	baseURL := viper.GetString("BASE_URL")
 	key := "?apiKey=" + viper.GetString("API_KEY")
-	endpoint := baseURL + apiUrl + key
+	endpoint := baseURL + apiURL + key
 	return endpoint
 }
 

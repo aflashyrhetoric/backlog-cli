@@ -21,8 +21,8 @@ package cmd
 
 // 	Run: func(cmd *cobra.Command, args []string) {
 
-// 		apiUrl:= "/api/v2/users/myself"
-// 		endpoint:= Endpoint(apiUrl)
+// 		apiURL:= "/api/v2/users/myself"
+// 		endpoint:= Endpoint(apiURL)
 
 // 		// Fetch
 // 		response, err := http.Get(endpoint);
@@ -30,7 +30,7 @@ package cmd
 // 		if err != nil {
 // 			fmt.Print(err.Error())
 // 			os.Exit(1)
-// 		}	
+// 		}
 
 // 		// Response
 // 		responseData, err := ioutil.ReadAll(response.Body)
@@ -45,7 +45,7 @@ package cmd
 // 			Email 	string 		`json:"mailAddress"`
 // 			Username 	string 		`json:"nulabAccount.uniqueId"`
 // 		}
-		
+
 // 		var responseObject User
 
 // 		json.Unmarshal(responseData, &responseObject)
