@@ -14,7 +14,7 @@
 
 package main
 
-import "backlog-cli/cmd"
+import "github.com/aflashyrhetoric/backlog-cli/cmd"
 
 func main() {
 	cmd.Execute()
