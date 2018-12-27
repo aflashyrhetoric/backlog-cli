@@ -4,6 +4,7 @@ import (
 	"backlog-cli/utils"
 	"encoding/json"
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,8 +15,8 @@ var meCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		apiUrl := "users/myself"
-		endpoint := utils.Endpoint(apiUrl)
+		apiURL := "users/myself"
+		endpoint := utils.Endpoint(apiURL)
 
 		// Fetch
 		responseData := utils.Get(endpoint)

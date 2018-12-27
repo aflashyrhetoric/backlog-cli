@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	git "gopkg.in/src-d/go-git.v4"
@@ -12,10 +13,10 @@ import (
 
 var cfgFile string
 var hc = http.Client{}
-var path string = "/Users/wdkevo/go/src/backlogtool.com/BLGTEST/testrepo"
-var formContentType string = "Content-Type:application/x-www-form-urlencoded"
+var path = "/home/wdkevo/go/src/backlogtool.com/BLGTEST/testrepo"
+var formContentType = "Content-Type:application/x-www-form-urlencoded"
 
-// RootCmd represents the base command when called without any subcommands
+// RootCmd ... The primary main cobra command
 var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
 	Short: "Use Backlog from the command line.",
@@ -23,8 +24,7 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// Execute ... runs the command
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -37,11 +37,15 @@ func init() {
 }
 
 // FIXME: Temporary getter for Project Key
+
+// ProjectKey ... Returns the project key for the configuration
 func ProjectKey() string {
 	return viper.GetString("PROJECT_KEY")
 }
 
 // FIXME: Temporary getter for repository name
+
+// Repo ... returns repository name in viper
 func Repo() string {
 	return viper.GetString("REPOSITORY_NAME")
 }
@@ -67,17 +71,35 @@ func initConfig() {
 	}
 }
 
+// Prints out a []byte response
 func printResponse(responseData []byte) {
 	fmt.Println(string(responseData[:]))
 }
 
+// Endpoint returns an endpoint
+func Endpoint(apiURL string) string {
+	baseURL := viper.GetString("BASE_URL")
+	key := "?apiKey=" + viper.GetString("API_KEY")
+	endpoint := baseURL + apiURL + key
+	return endpoint
+}
+
+// Checks for errors
 func errorCheck(err error) {
+	if err != nil {
+		fmt.Printf("#%v", err)
+	}
+}
+
+// Checks for errors, panics if found
+func errorPanic(err error) {
 	if err != nil {
 		fmt.Printf("#%v", err)
 		panic(err)
 	}
 }
 
+// Gets current branch name.
 func currentBranch(path string) string {
 	repo, err := git.PlainOpen(path)
 	errorCheck(err)
