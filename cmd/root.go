@@ -5,7 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	// git "github.com/src-d/go-git"
 	git "gopkg.in/src-d/go-git.v4"
+
 	//"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"os"
@@ -13,7 +16,9 @@ import (
 
 var cfgFile string
 var hc = http.Client{}
-var path = "/home/wdkevo/go/src/backlogtool.com/BLGTEST/testrepo"
+
+// Hard-code path string
+var path = "/Users/wdkevo/Nulab/cacoo-blog"
 var formContentType = "Content-Type:application/x-www-form-urlencoded"
 
 // RootCmd ... The primary main cobra command
@@ -60,7 +65,6 @@ func initConfig() {
 		viper.SetConfigName(".backlog-cli")
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
-		// viper.SetEnvPrefix("backlog")
 
 		// read in environment variables that match
 		viper.AutomaticEnv()

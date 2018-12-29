@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"backlog-cli/utils"
 	"encoding/json"
 	"fmt"
+
+	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"github.com/spf13/cobra"
 )

@@ -1,15 +1,16 @@
 package cmd
 
 import (
-	"backlog-cli/utils"
 	"encoding/json"
 	"fmt"
 
-	"github.com/spf13/cobra"
-	//"gopkg.in/src-d/go-git.v4/plumbing"
+	"github.com/aflashyrhetoric/backlog-cli/utils"
+
 	"net/url"
 	"regexp"
 	"strconv"
+
+	"github.com/spf13/cobra"
 )
 
 // Gets
@@ -25,7 +26,7 @@ var prCmd = &cobra.Command{
 		currentBranch := currentBranch(path)
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
 		issueID := string(reg.Find([]byte(currentBranch)))
-		//fmt.Println(issueId)
+		fmt.Println(issueID)
 
 		apiURL := "issues/" + string(issueID)
 
