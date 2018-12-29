@@ -13,6 +13,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type pullRequest struct {
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
+	Base        string `json:"base"`
+	Branch      string `json:"branch"`
+	ID          int    `json:"id"`
+}
+
 // Gets
 var prCmd = &cobra.Command{
 	Use:   "pr",
@@ -70,15 +78,7 @@ var prCmd = &cobra.Command{
 
 		responseData = utils.Post(endpoint, form)
 
-		// A Response struct to map the Entire Response
-		type PullRequest struct {
-			Summary     string `json:"summary"`
-			Description string `json:"description"`
-			Base        string `json:"base"`
-			Branch      string `json:"branch"`
-			ID          int    `json:"id"`
-		}
-		var returnedPullRequestCount PullRequest
+		var returnedPullRequestCount pullRequest
 		json.Unmarshal(responseData, &returnedPullRequestCount)
 		printResponse(responseData)
 

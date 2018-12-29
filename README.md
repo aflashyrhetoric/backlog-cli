@@ -6,5 +6,4 @@ A CLI tool to interact with [Backlog](backlogtool.com), a project management too
 
 ```bash
 go get
-dep ensure
 ```

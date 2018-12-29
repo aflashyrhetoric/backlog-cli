@@ -82,6 +82,7 @@ func printResponse(responseData []byte) {
 
 // Endpoint returns an endpoint
 func Endpoint(apiURL string) string {
+	// FIXME: We should just take SpaceID and build the "baseURL" from that
 	baseURL := viper.GetString("BASE_URL")
 	key := "?apiKey=" + viper.GetString("API_KEY")
 	endpoint := baseURL + apiURL + key
@@ -109,6 +110,10 @@ func currentBranch(path string) string {
 	errorCheck(err)
 
 	branchName, err := repo.Head()
+
+	/* Fetch the branch name by splicing the string
+	 * FIXME: IS there a more reliable way?
+	 */
 	currentBranchName := branchName.Name()[11:]
 	errorCheck(err)
 
