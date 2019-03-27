@@ -18,7 +18,7 @@ var configFile string
 var hc = http.Client{}
 
 // Hard-code path string
-var path = "/Users/wdkevo/Nulab/cacoo-blog"
+var path = "/Users/kevinoh/Nulab/cacoo-blog"
 var formContentType = "Content-Type:application/x-www-form-urlencoded"
 
 // RootCmd ... The primary main cobra command
@@ -41,20 +41,6 @@ func init() {
 	cobra.OnInitialize(initConfig)
 }
 
-// FIXME: Temporary getter for Project Key
-
-// ProjectKey ... Returns the project key for the configuration
-func ProjectKey() string {
-	return viper.GetString("PROJECT_KEY")
-}
-
-// FIXME: Temporary getter for repository name
-
-// Repo ... returns repository name in viper
-func Repo() string {
-	return viper.GetString("REPOSITORY_NAME")
-}
-
 func initConfig() {
 	if configFile != "" {
 		fmt.Println("Config found. Loading...")
@@ -62,7 +48,7 @@ func initConfig() {
 	} else {
 		fmt.Println("Config not found. Setting defaults...")
 
-		viper.SetConfigName(".backlog-cli")
+		viper.SetConfigName("config")
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
 
@@ -74,6 +60,8 @@ func initConfig() {
 		}
 	}
 }
+
+// FIXME: Temporary getter for Project Key
 
 // Prints out a []byte response
 func printResponse(responseData []byte) {
