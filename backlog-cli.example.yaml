@@ -6,7 +6,7 @@ API_KEY=
 # TEMPORARY VALUES
 
 # FIXME: Temporarily, the full baseURL can be added here
-BASE_URL=
+BASEURL=
 # FIXME: Temporarily, just enter project key, e.g.: "CACOO"
 PROJECT_KEY=
 # FIXME: Temporarily, just enter repository name

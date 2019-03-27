@@ -12,12 +12,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var configFile string
 var hc = http.Client{}
 
 // Endpoint returns an endpoint
 func Endpoint(apiURL string) string {
-	baseURL := viper.GetString("BASE_URL")
+	baseURL := viper.GetString("BASEURL")
 	key := "?apiKey=" + viper.GetString("API_KEY")
 	endpoint := baseURL + apiURL + key
 	return endpoint

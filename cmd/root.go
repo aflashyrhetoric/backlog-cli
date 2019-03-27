@@ -14,7 +14,7 @@ import (
 	"os"
 )
 
-var cfgFile string
+var configFile string
 var hc = http.Client{}
 
 // Hard-code path string
@@ -25,7 +25,7 @@ var formContentType = "Content-Type:application/x-www-form-urlencoded"
 var RootCmd = &cobra.Command{
 	Use:   "backlog-cli",
 	Short: "Use Backlog from the command line.",
-	Long:  `to quickly create a Cobra application.`,
+	Long:  `Use Backlog from the command line to create pull requests, check issue status, access web pages, etc.`,
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
@@ -56,9 +56,9 @@ func Repo() string {
 }
 
 func initConfig() {
-	if cfgFile != "" {
+	if configFile != "" {
 		fmt.Println("Config found. Loading...")
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(configFile)
 	} else {
 		fmt.Println("Config not found. Setting defaults...")
 
@@ -83,7 +83,7 @@ func printResponse(responseData []byte) {
 // Endpoint returns an endpoint
 func Endpoint(apiURL string) string {
 	// FIXME: We should just take SpaceID and build the "baseURL" from that
-	baseURL := viper.GetString("BASE_URL")
+	baseURL := viper.GetString("BASEURL")
 	key := "?apiKey=" + viper.GetString("API_KEY")
 	endpoint := baseURL + apiURL + key
 	return endpoint
