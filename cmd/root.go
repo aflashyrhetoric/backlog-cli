@@ -42,22 +42,24 @@ func init() {
 }
 
 func initConfig() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("$HOME")
+
 	if configFile != "" {
 		fmt.Println("Config found. Loading...")
-		viper.SetConfigFile(configFile)
+		// FIXME Allow for dynamic configuration file loading
+		viper.SetConfigName(configFile)
 	} else {
 		fmt.Println("Config not found. Setting defaults...")
-
-		viper.SetConfigName("config")
-		viper.AddConfigPath(".")
-		viper.SetConfigType("yaml")
-
 		// read in environment variables that match
-		viper.AutomaticEnv()
 		// If a config file is found, read it in.
 		if err := viper.ReadInConfig(); err == nil {
 			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		} else {
+			fmt.Println(err)
 		}
+		viper.AutomaticEnv()
 	}
 }
 
@@ -93,15 +95,12 @@ func errorPanic(err error) {
 }
 
 // Gets current branch name.
-func currentBranch(path string) string {
+func currentBranch() string {
 	repo, err := git.PlainOpen(path)
 	errorCheck(err)
 
 	branchName, err := repo.Head()
 
-	/* Fetch the branch name by splicing the string
-	 * FIXME: IS there a more reliable way?
-	 */
 	currentBranchName := branchName.Name()[11:]
 	errorCheck(err)
 

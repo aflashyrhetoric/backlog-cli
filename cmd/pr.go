@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/spf13/viper"
+
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"net/url"
@@ -31,12 +33,12 @@ var prCmd = &cobra.Command{
 		// ---------------------------------------------------------
 
 		// By default, get Issue ID from current branch name if possible
-		currentBranch := currentBranch(path)
+		currentBranch := currentBranch()
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
 		issueID := string(reg.Find([]byte(currentBranch)))
 		fmt.Println(issueID)
 
-		apiURL := "issues/" + string(issueID)
+		apiURL := "/api/v2/issues/" + string(issueID)
 
 		if currentBranch == "staging" || currentBranch == "dev" || currentBranch == "beta" {
 			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
@@ -46,8 +48,9 @@ var prCmd = &cobra.Command{
 			fmt.Printf("Creating PR for %v branch.", currentBranch)
 		}
 
-		endpoint := utils.Endpoint(apiURL)
-		fmt.Println(endpoint)
+		endpoint := Endpoint(apiURL)
+		// fmt.Println("Endpoint is:")
+		// fmt.Println(endpoint)
 		type Issue struct {
 			ID int `json:"id"`
 		}
@@ -63,10 +66,10 @@ var prCmd = &cobra.Command{
 		// ---------------------------------------------------------
 		p := ProjectKey()
 		r := Repo()
-		apiURL = "projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
 		//apiURL = "test"
-		endpoint = utils.Endpoint(apiURL)
+		endpoint = Endpoint(apiURL)
 
 		// Build out Form
 		form := url.Values{}
@@ -74,7 +77,7 @@ var prCmd = &cobra.Command{
 		form.Add("description", "Test description")
 		form.Add("base", "master")
 		form.Add("branch", currentBranch)
-		form.Add("issueID", issueID)
+		form.Add("issueId", issueID)
 
 		responseData = utils.Post(endpoint, form)
 
@@ -83,13 +86,11 @@ var prCmd = &cobra.Command{
 		printResponse(responseData)
 
 		fmt.Println(returnedPullRequestCount.Summary)
-
-		//err = branches.ForEach(reference)
-		//errorCheck(err)
 	},
 }
 
 func init() {
+	viper.AutomaticEnv()
 	RootCmd.AddCommand(prCmd)
 }
 
