@@ -49,8 +49,8 @@ var prCmd = &cobra.Command{
 		}
 
 		endpoint := Endpoint(apiURL)
-		// fmt.Println("Endpoint is:")
-		// fmt.Println(endpoint)
+		fmt.Println("Endpoint is:")
+		fmt.Println(endpoint)
 		type Issue struct {
 			ID int `json:"id"`
 		}
@@ -59,8 +59,6 @@ var prCmd = &cobra.Command{
 		json.Unmarshal(responseData, &currentIssue)
 		// Convert integer -> string for use in later functions
 		issueID = strconv.Itoa(currentIssue.ID)
-
-		//fmt.Println(issueID)
 
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------

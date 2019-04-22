@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	// git "github.com/src-d/go-git"
 	git "gopkg.in/src-d/go-git.v4"
-
 	//"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"os"
@@ -17,8 +17,6 @@ import (
 var configFile string
 var hc = http.Client{}
 
-// Hard-code path string
-var path = "/Users/kevinoh/Nulab/cacoo-blog"
 var formContentType = "Content-Type:application/x-www-form-urlencoded"
 
 // RootCmd ... The primary main cobra command
@@ -96,6 +94,12 @@ func errorPanic(err error) {
 
 // Gets current branch name.
 func currentBranch() string {
+	var path string
+	path, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	repo, err := git.PlainOpen(path)
 	errorCheck(err)
 
