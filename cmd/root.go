@@ -56,6 +56,7 @@ func initConfig() {
 	// FIXME: Remove debug info for production build
 	if configFile != "" {
 		fmt.Printf("Config found. Loaded %s\n", configFile)
+
 		GlobalConfig = Config{
 			BaseURL:        viper.GetString("BASEURL"),
 			ProjectKey:     ProjectKey(),
@@ -63,6 +64,7 @@ func initConfig() {
 			RepositoryName: RepositoryName(),
 			CurrentBranch:  CurrentBranch(),
 		}
+
 	} else {
 		fmt.Println("Config not found. Please create a config at $HOME/backlog-config.yaml")
 	}
