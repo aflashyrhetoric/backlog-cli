@@ -31,6 +31,7 @@ var prCmd = &cobra.Command{
 		// ---------------------------------------------------------
 
 		// By default, get Issue ID from current branch name if possible
+		// var formContentType := "Content-Type:application/x-www-form-urlencoded"
 		CurrentBranch := CurrentBranch()
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
 		issueID := string(reg.Find([]byte(CurrentBranch)))
@@ -61,7 +62,7 @@ var prCmd = &cobra.Command{
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
 		p := ProjectKey()
-		r := RepoName()
+		r := RepositoryName()
 		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
 		//apiURL = "test"

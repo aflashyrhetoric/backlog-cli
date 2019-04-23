@@ -8,17 +8,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	// git "github.com/src-d/go-git"
-	git "gopkg.in/src-d/go-git.v4"
-	//"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"os"
+
+	git "gopkg.in/src-d/go-git.v4"
 )
 
 var configFile string
 var hc = http.Client{}
-
-var formContentType = "Content-Type:application/x-www-form-urlencoded"
 
 // RootCmd ... The primary main cobra command
 var RootCmd = &cobra.Command{
@@ -31,7 +28,7 @@ var RootCmd = &cobra.Command{
 // Execute ... runs the command
 func Execute() {
 	// fmt.Printf("Project Key '%v'\n", ProjectKey())
-	// fmt.Printf("Repo name '%v'\n", RepoName())
+	// fmt.Printf("Repo name '%v'\n", RepositoryName())
 	// fmt.Printf("branchname '%v'\n", CurrentBranch())
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -44,25 +41,33 @@ func init() {
 }
 
 func initConfig() {
-	viper.SetConfigName("config")
+	viper.SetConfigName("backlog-config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("$HOME")
 
+	// Load config
+	err := viper.ReadInConfig()
+	ErrorCheck(err)
+
+	// Set name
+	configFile = viper.ConfigFileUsed()
+	viper.SetConfigName(configFile)
+
+	// FIXME: Remove debug info for production build
 	if configFile != "" {
-		fmt.Println("Config found. Loading...")
-		// FIXME Allow for dynamic configuration file loading
-		viper.SetConfigName(configFile)
-	} else {
-		fmt.Println("Config not found. Setting defaults...")
-		// read in environment variables that match
-		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err == nil {
-			fmt.Println("Using config file:", viper.ConfigFileUsed())
-		} else {
-			fmt.Println(err)
+		fmt.Printf("Config found. Loaded %s\n", configFile)
+		GlobalConfig = Config{
+			BaseURL:        viper.GetString("BASEURL"),
+			ProjectKey:     ProjectKey(),
+			Repository:     Repository(),
+			RepositoryName: RepositoryName(),
+			CurrentBranch:  CurrentBranch(),
 		}
-		viper.AutomaticEnv()
+	} else {
+		fmt.Println("Config not found. Please create a config at $HOME/backlog-config.yaml")
 	}
+
+	viper.AutomaticEnv()
 }
 
 // CurrentBranch .. Gets current branch name.
@@ -84,8 +89,8 @@ func CurrentBranch() string {
 	return string(CurrentBranchName)
 }
 
-// Repo .. Returns repository
-func Repo() *git.Repository {
+// Repository .. Returns current repository
+func Repository() *git.Repository {
 	var path string
 	path, err := os.Getwd()
 	if err != nil {
@@ -108,17 +113,10 @@ func ProjectKey() string {
 	return projectKeyReferenceName
 }
 
-// RepoName ... returns repository name
-func RepoName() string {
-	var path string
-	path, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
+// RepositoryName ... returns current repository name
+func RepositoryName() string {
 
-	// Open Git repo
-	repo, err := git.PlainOpen(path)
-	ErrorCheck(err)
+	repo := Repository()
 
 	// Open the 'origin' remote
 	originRemote, err := repo.Remote("origin")

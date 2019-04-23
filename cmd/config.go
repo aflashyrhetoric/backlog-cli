@@ -1,7 +1,14 @@
 package cmd
 
+import git "gopkg.in/src-d/go-git.v4"
+
 // Config .. represents the configuration for backlog-cli
+var GlobalConfig Config
+
 type Config struct {
-	projectKey     string
-	repositoryName string
+	BaseURL        string
+	ProjectKey     string
+	Repository     *git.Repository
+	RepositoryName string
+	CurrentBranch  string
 }

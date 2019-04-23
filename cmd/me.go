@@ -20,6 +20,8 @@ var meCmd = &cobra.Command{
 		apiURL := "/api/v2/users/myself"
 		endpoint := Endpoint(apiURL)
 
+		fmt.Println(endpoint)
+
 		// Fetch
 		responseData := utils.Get(endpoint)
 
@@ -36,7 +38,7 @@ var meCmd = &cobra.Command{
 		json.Unmarshal(responseData, &returnedUser)
 		fmt.Printf("Name: %s\n", returnedUser.Name)
 		fmt.Printf("Email: %s\n", returnedUser.Email)
-		fmt.Printf("Link to Profile: %s/user/%s\n", viper.GetString("BASEURL"), returnedUser.ID)
+		fmt.Printf("Link to Profile: %s/user/%s\n", GlobalConfig.BaseURL, returnedUser.ID)
 		fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", viper.GetString("BASEURL"), returnedUser.ID)
 	},
 }

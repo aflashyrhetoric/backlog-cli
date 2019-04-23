@@ -16,7 +16,7 @@ var gitCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Open repository and fetch logs
-		r := Repo()
+		r := Repository()
 		logs, err := r.Log(&git.LogOptions{})
 		ErrorPanic(err)
 
@@ -29,7 +29,7 @@ var gitCmd = &cobra.Command{
 		latestCommitID := latestCommit.ID()
 
 		// Assemble the URL
-		commitURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", viper.GetString("BASEURL"), ProjectKey(), RepoName(), latestCommitID)
+		commitURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", viper.GetString("BASEURL"), ProjectKey(), RepositoryName(), latestCommitID)
 
 		// Fetch
 		fmt.Printf("Your latest commit: %s", commitURL)
