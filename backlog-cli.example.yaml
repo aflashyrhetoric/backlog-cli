@@ -1,13 +1,4 @@
-# Backlog SpaceID
-BACKLOG_SPACE_ID=
 # API_KEY FROM BACKLOG
-API_KEY=
-
-# TEMPORARY VALUES
-
-# FIXME: Temporarily, the full baseURL can be added here
-BASEURL=
-# FIXME: Temporarily, just enter project key, e.g.: "CACOO"
-PROJECT_KEY=
-# FIXME: Temporarily, just enter repository name
-# REPOSITORY_NAME=
+API_KEY: 123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc
+# BASEURL for API
+BASEURL: https://nulab.backlog.jp/
