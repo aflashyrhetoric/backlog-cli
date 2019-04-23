@@ -16,17 +16,17 @@ var meCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		apiURL := "users/myself"
-		endpoint := utils.Endpoint(apiURL)
+		apiURL := "/api/v2/users/myself"
+		endpoint := Endpoint(apiURL)
 
 		// Fetch
 		responseData := utils.Get(endpoint)
 
 		// A Response struct to map the Entire Response
 		type User struct {
-			Name     string `json:"name"`
-			Email    string `json:"mailAddress"`
-			Username string `json:"nulabAccount.uniqueId"`
+			Name  string `json:"name"`
+			Email string `json:"mailAddress"`
+			ID    string `json:"userId"`
 		}
 
 		var returnedUser User

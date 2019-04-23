@@ -30,9 +30,9 @@ var RootCmd = &cobra.Command{
 
 // Execute ... runs the command
 func Execute() {
-	fmt.Printf("Project Key '%v'\n", ProjectKey())
-	fmt.Printf("Repo name '%v'\n", RepoName())
-	fmt.Printf("branchname '%v'\n", CurrentBranch())
+	// fmt.Printf("Project Key '%v'\n", ProjectKey())
+	// fmt.Printf("Repo name '%v'\n", RepoName())
+	// fmt.Printf("branchname '%v'\n", CurrentBranch())
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

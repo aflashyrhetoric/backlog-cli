@@ -8,20 +8,10 @@ import (
 	"net/url"
 	"os"
 	"strings"
-
-	"github.com/spf13/viper"
 )
 
 var configFile string
 var hc = http.Client{}
-
-// Endpoint returns an endpoint
-func Endpoint(apiURL string) string {
-	baseURL := viper.GetString("BASEURL")
-	key := "?apiKey=" + viper.GetString("API_KEY")
-	endpoint := baseURL + apiURL + key
-	return endpoint
-}
 
 func Get(endpoint string) []byte {
 	response, err := http.Get(endpoint)

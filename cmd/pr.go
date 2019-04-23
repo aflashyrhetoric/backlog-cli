@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spf13/viper"
-
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"net/url"
@@ -88,7 +86,6 @@ var prCmd = &cobra.Command{
 }
 
 func init() {
-	viper.AutomaticEnv()
 	RootCmd.AddCommand(prCmd)
 }
 
