@@ -19,7 +19,7 @@ var meCmd = &cobra.Command{
 		apiURL := "/api/v2/users/myself"
 		endpoint := Endpoint(apiURL)
 
-		fmt.Println(endpoint)
+		// fmt.Println(endpoint)
 
 		// Fetch
 		responseData := utils.Get(endpoint)

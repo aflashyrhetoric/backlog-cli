@@ -39,7 +39,7 @@ var prCmd = &cobra.Command{
 
 		apiURL := "/api/v2/issues/" + string(issueID)
 
-		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "beta" {
+		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
 			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
 		} else if CurrentBranch == "0" {
 			fmt.Println("Invalid branch. Try again.")
