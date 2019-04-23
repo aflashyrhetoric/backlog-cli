@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	git "gopkg.in/src-d/go-git.v4"
 )
 
@@ -29,7 +28,7 @@ var gitCmd = &cobra.Command{
 		latestCommitID := latestCommit.ID()
 
 		// Assemble the URL
-		commitURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", viper.GetString("BASEURL"), ProjectKey(), RepositoryName(), latestCommitID)
+		commitURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", GlobalConfig.BaseURL, ProjectKey(), RepositoryName(), latestCommitID)
 
 		// Fetch
 		fmt.Printf("Your latest commit: %s", commitURL)

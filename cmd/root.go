@@ -59,6 +59,7 @@ func initConfig() {
 
 		GlobalConfig = Config{
 			BaseURL:        viper.GetString("BASEURL"),
+			APIKey:         viper.GetString("API_KEY"),
 			ProjectKey:     ProjectKey(),
 			Repository:     Repository(),
 			RepositoryName: RepositoryName(),

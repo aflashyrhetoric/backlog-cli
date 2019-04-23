@@ -7,6 +7,7 @@ var GlobalConfig Config
 
 type Config struct {
 	BaseURL        string
+	APIKey         string
 	ProjectKey     string
 	Repository     *git.Repository
 	RepositoryName string

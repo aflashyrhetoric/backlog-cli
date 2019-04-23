@@ -1,7 +1,6 @@
 .PHONY: build moveToBin all
 
 PWD = $(shell pwd)
-# HOME = $(shell "echo $$HOME")
 
 default: all
 

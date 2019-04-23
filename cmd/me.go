@@ -7,7 +7,6 @@ import (
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var meCmd = &cobra.Command{
@@ -39,7 +38,7 @@ var meCmd = &cobra.Command{
 		fmt.Printf("Name: %s\n", returnedUser.Name)
 		fmt.Printf("Email: %s\n", returnedUser.Email)
 		fmt.Printf("Link to Profile: %s/user/%s\n", GlobalConfig.BaseURL, returnedUser.ID)
-		fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", viper.GetString("BASEURL"), returnedUser.ID)
+		fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", GlobalConfig.BaseURL, returnedUser.ID)
 	},
 }
 
