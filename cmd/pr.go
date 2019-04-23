@@ -24,7 +24,7 @@ type pullRequest struct {
 // Gets
 var prCmd = &cobra.Command{
 	Use:   "pr",
-	Short: "Creates a Backlog Pull Request for the current branch",
+	Short: "Creates a Backlog Pull Request for the current branch -> master",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -88,9 +88,3 @@ var prCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(prCmd)
 }
-
-//func reference(refer *plumbing.Reference) error {
-//	//fmt.Printf("%#v\n", refer)
-//	fmt.Printf("%s\n", refer.Name()[11:])
-//	return nil
-//}

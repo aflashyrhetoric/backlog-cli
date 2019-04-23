@@ -27,11 +27,13 @@ var userCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		// By default, get Issue ID from current branch name if possible
+		// Set up Endpoint
 		apiURL := "/api/v2/users/myself"
 		endpoint := Endpoint(apiURL)
-		responseData := utils.Get(endpoint)
+
+		// Unmarshal response data to variable
 		var currentUser User
+		responseData := utils.Get(endpoint)
 		json.Unmarshal(responseData, &currentUser)
 		fmt.Printf("User info for: %v", currentUser)
 	},

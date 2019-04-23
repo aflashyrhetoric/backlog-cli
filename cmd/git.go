@@ -10,26 +10,29 @@ import (
 
 var gitCmd = &cobra.Command{
 	Use:   "commit",
-	Short: "A brief description of your command",
+	Short: "Get a link to the latest commit",
 	Long:  `to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// Open repository and fetch logs
 		r := Repo()
 		logs, err := r.Log(&git.LogOptions{})
 		ErrorPanic(err)
 
+		// Fetch latest commit
 		latestCommit, err := logs.Next()
 		ErrorPanic(err)
-
 		logs.Close()
+
+		// Fetch ID from latest commit
 		latestCommitID := latestCommit.ID()
 
-		templateURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", viper.GetString("BASEURL"), ProjectKey(), RepoName(), latestCommitID)
-		// templateURL :=
+		// Assemble the URL
+		commitURL := fmt.Sprintf("%s/git/%s/%s/commit/%v", viper.GetString("BASEURL"), ProjectKey(), RepoName(), latestCommitID)
 
 		// Fetch
-		fmt.Printf("Your latest commit: %s", templateURL)
+		fmt.Printf("Your latest commit: %s", commitURL)
 	},
 }
 
