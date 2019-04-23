@@ -33,19 +33,19 @@ var prCmd = &cobra.Command{
 		// ---------------------------------------------------------
 
 		// By default, get Issue ID from current branch name if possible
-		currentBranch := currentBranch()
+		CurrentBranch := CurrentBranch()
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
-		issueID := string(reg.Find([]byte(currentBranch)))
+		issueID := string(reg.Find([]byte(CurrentBranch)))
 		fmt.Println(issueID)
 
 		apiURL := "/api/v2/issues/" + string(issueID)
 
-		if currentBranch == "staging" || currentBranch == "dev" || currentBranch == "beta" {
+		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "beta" {
 			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
-		} else if currentBranch == "0" {
+		} else if CurrentBranch == "0" {
 			fmt.Println("Invalid branch. Try again.")
 		} else {
-			fmt.Printf("Creating PR for %v branch.", currentBranch)
+			fmt.Printf("Creating PR for %v branch.", CurrentBranch)
 		}
 
 		endpoint := Endpoint(apiURL)
@@ -63,7 +63,7 @@ var prCmd = &cobra.Command{
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
 		p := ProjectKey()
-		r := Repo()
+		r := RepoName()
 		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
 		//apiURL = "test"
@@ -74,14 +74,14 @@ var prCmd = &cobra.Command{
 		form.Add("summary", "Test summary")
 		form.Add("description", "Test description")
 		form.Add("base", "master")
-		form.Add("branch", currentBranch)
+		form.Add("branch", CurrentBranch)
 		form.Add("issueId", issueID)
 
 		responseData = utils.Post(endpoint, form)
 
 		var returnedPullRequestCount pullRequest
 		json.Unmarshal(responseData, &returnedPullRequestCount)
-		printResponse(responseData)
+		PrintResponse(responseData)
 
 		fmt.Println(returnedPullRequestCount.Summary)
 	},

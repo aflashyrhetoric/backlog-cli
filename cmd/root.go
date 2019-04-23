@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,6 +30,9 @@ var RootCmd = &cobra.Command{
 
 // Execute ... runs the command
 func Execute() {
+	fmt.Printf("Project Key '%v'\n", ProjectKey())
+	fmt.Printf("Repo name '%v'\n", RepoName())
+	fmt.Printf("branchname '%v'\n", CurrentBranch())
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -61,39 +65,8 @@ func initConfig() {
 	}
 }
 
-// FIXME: Temporary getter for Project Key
-
-// Prints out a []byte response
-func printResponse(responseData []byte) {
-	fmt.Println(string(responseData[:]))
-}
-
-// Endpoint returns an endpoint
-func Endpoint(apiURL string) string {
-	// FIXME: We should just take SpaceID and build the "baseURL" from that
-	baseURL := viper.GetString("BASEURL")
-	key := "?apiKey=" + viper.GetString("API_KEY")
-	endpoint := baseURL + apiURL + key
-	return endpoint
-}
-
-// Checks for errors
-func errorCheck(err error) {
-	if err != nil {
-		fmt.Printf("#%v", err)
-	}
-}
-
-// Checks for errors, panics if found
-func errorPanic(err error) {
-	if err != nil {
-		fmt.Printf("#%v", err)
-		panic(err)
-	}
-}
-
-// Gets current branch name.
-func currentBranch() string {
+// CurrentBranch .. Gets current branch name.
+func CurrentBranch() string {
 	var path string
 	path, err := os.Getwd()
 	if err != nil {
@@ -101,12 +74,49 @@ func currentBranch() string {
 	}
 
 	repo, err := git.PlainOpen(path)
-	errorCheck(err)
+	ErrorCheck(err)
 
 	branchName, err := repo.Head()
 
-	currentBranchName := branchName.Name()[11:]
-	errorCheck(err)
+	CurrentBranchName := branchName.Name()[11:]
+	ErrorCheck(err)
 
-	return string(currentBranchName)
+	return string(CurrentBranchName)
+}
+
+// ProjectKey ... Returns the project key for the configuration
+func ProjectKey() string {
+	var cb string
+	cb = CurrentBranch()
+	reg := regexp.MustCompile(`(.*)-[0-9]+`)
+	projectKeyCapturedString := reg.FindSubmatch([]byte(cb))
+	projectKeyReferenceName := string(projectKeyCapturedString[1])
+	return projectKeyReferenceName
+}
+
+// RepoName ... returns repository name
+func RepoName() string {
+	var path string
+	path, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Open Git repo
+	repo, err := git.PlainOpen(path)
+	ErrorCheck(err)
+
+	// Open the 'origin' remote
+	originRemote, err := repo.Remote("origin")
+	ErrorCheck(err)
+
+	// Fetch references from 'origin'
+	repoReferences := originRemote.String()
+
+	// Capture repository name from reference
+	reg := regexp.MustCompile(`\/[A-Z]*\/(.*)\.git`)
+	repositoryCapturedString := reg.FindSubmatch([]byte(repoReferences))
+	repositoryReferenceName := string(repositoryCapturedString[1])
+
+	return repositoryReferenceName
 }
