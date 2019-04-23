@@ -84,6 +84,20 @@ func CurrentBranch() string {
 	return string(CurrentBranchName)
 }
 
+// Repo .. Returns repository
+func Repo() *git.Repository {
+	var path string
+	path, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	repo, err := git.PlainOpen(path)
+	ErrorCheck(err)
+
+	return repo
+}
+
 // ProjectKey ... Returns the project key for the configuration
 func ProjectKey() string {
 	var cb string
