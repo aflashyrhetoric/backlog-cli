@@ -7,6 +7,7 @@ import (
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var meCmd = &cobra.Command{
@@ -24,16 +25,19 @@ var meCmd = &cobra.Command{
 
 		// A Response struct to map the Entire Response
 		type User struct {
-			Name  string `json:"name"`
-			Email string `json:"mailAddress"`
-			ID    string `json:"userId"`
+			Name     string `json:"name"`
+			Email    string `json:"mailAddress"`
+			Language string `json:"lang"`
+			ID       string `json:"userId"`
 		}
 
 		var returnedUser User
 
 		json.Unmarshal(responseData, &returnedUser)
-		fmt.Println(returnedUser.Name)
-		fmt.Println(returnedUser.Email)
+		fmt.Printf("Name: %s\n", returnedUser.Name)
+		fmt.Printf("Email: %s\n", returnedUser.Email)
+		fmt.Printf("Link to Profile: %s/user/%s\n", viper.GetString("BASEURL"), returnedUser.ID)
+		fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", viper.GetString("BASEURL"), returnedUser.ID)
 	},
 }
 
