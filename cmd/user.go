@@ -9,14 +9,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// User .. represents a Backlog user
+// User .. represents the current Backlog user
 type User struct {
-	ID          int    `json:"id"`
-	UserID      string `json:"userId"`
-	Name        string `json:"name"`
-	Language    string `json:"lang"`
-	MailAddress string `json:"mailAddress"`
+	ID       int    `json:"id"`
+	Username string `json:"userId"`
+	Name     string `json:"name"`
+	Email    string `json:"mailAddress"`
+	Language string `json:"lang"`
 }
+
+// CurrentUser ..
+type CurrentUser User
 
 // Gets
 var userCmd = &cobra.Command{
@@ -37,6 +40,23 @@ var userCmd = &cobra.Command{
 		json.Unmarshal(responseData, &currentUser)
 		fmt.Printf("User info for: %v", currentUser)
 	},
+}
+
+// GetCurrentUser .. Returns the current user
+func GetCurrentUser() User {
+	apiURL := "/api/v2/users/myself"
+	endpoint := Endpoint(apiURL)
+
+	// Fetch
+	responseData := utils.Get(endpoint)
+
+	// A Response struct to map the Entire Response
+	var returnedUser User
+	json.Unmarshal(responseData, &returnedUser)
+
+	GlobalConfig.setUser(returnedUser)
+
+	return returnedUser
 }
 
 func init() {

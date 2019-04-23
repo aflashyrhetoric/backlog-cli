@@ -14,12 +14,15 @@ import (
 )
 
 type pullRequest struct {
+	Number      int    `json:"number"`
 	Summary     string `json:"summary"`
 	Description string `json:"description"`
 	Base        string `json:"base"`
 	Branch      string `json:"branch"`
-	ID          int    `json:"id"`
 }
+
+var branchName string
+var currentIssue Issue
 
 // Gets
 var prCmd = &cobra.Command{
@@ -48,13 +51,9 @@ var prCmd = &cobra.Command{
 		}
 
 		endpoint := Endpoint(apiURL)
-		fmt.Println("Endpoint is:")
-		fmt.Println(endpoint)
-		type Issue struct {
-			ID int `json:"id"`
-		}
+		// fmt.Println("Endpoint is:")
+		// fmt.Println(endpoint)
 		responseData := utils.Get(endpoint)
-		var currentIssue Issue
 		json.Unmarshal(responseData, &currentIssue)
 		// Convert integer -> string for use in later functions
 		issueID = strconv.Itoa(currentIssue.ID)
@@ -72,20 +71,27 @@ var prCmd = &cobra.Command{
 		form := url.Values{}
 		form.Add("summary", "Test summary")
 		form.Add("description", "Test description")
-		form.Add("base", "master")
+		// Branch to merge to
+		form.Add("base", branchName)
+		// Branch of branch we are merging
 		form.Add("branch", CurrentBranch)
 		form.Add("issueId", issueID)
+		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
 
 		responseData = utils.Post(endpoint, form)
 
-		var returnedPullRequestCount pullRequest
-		json.Unmarshal(responseData, &returnedPullRequestCount)
-		PrintResponse(responseData)
+		var returnedPullRequest pullRequest
+		json.Unmarshal(responseData, &returnedPullRequest)
 
-		fmt.Println(returnedPullRequestCount.Summary)
+		fmt.Println(returnedPullRequest)
+		currentPullRequestID := strconv.Itoa(returnedPullRequest.Number)
+
+		linkToPR := fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, currentPullRequestID)
+		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
 
 func init() {
+	prCmd.Flags().StringVarP(&branchName, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
 	RootCmd.AddCommand(prCmd)
 }

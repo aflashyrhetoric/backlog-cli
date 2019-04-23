@@ -66,6 +66,8 @@ func initConfig() {
 			CurrentBranch:  CurrentBranch(),
 		}
 
+		GetCurrentUser()
+
 	} else {
 		fmt.Println("Config not found. Please create a config at $HOME/backlog-config.yaml")
 	}
