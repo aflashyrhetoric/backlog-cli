@@ -10,4 +10,4 @@ BASEURL=
 # FIXME: Temporarily, just enter project key, e.g.: "CACOO"
 PROJECT_KEY=
 # FIXME: Temporarily, just enter repository name
-REPOSITORY_NAME=
+# REPOSITORY_NAME=
