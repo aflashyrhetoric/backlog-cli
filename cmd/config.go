@@ -16,6 +16,7 @@ type Config struct {
 	CurrentBranch  string
 }
 
+// Helper to set the User to the GlobalConfig
 func (u *Config) setUser(user User) {
 	u.User = user
 }

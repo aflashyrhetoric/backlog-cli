@@ -7,6 +7,7 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 )
 
+// FIXME: 'commit' should be a child of `git`, or in its own file, etc
 var gitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Get a link to the latest commit",

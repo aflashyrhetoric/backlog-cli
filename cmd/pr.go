@@ -13,7 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type pullRequest struct {
+// PullRequest .. a PARTIAL struct for a PullRequest on Backlog
+type PullRequest struct {
 	Number      int    `json:"number"`
 	Summary     string `json:"summary"`
 	Description string `json:"description"`
@@ -80,7 +81,7 @@ var prCmd = &cobra.Command{
 
 		responseData = utils.Post(endpoint, form)
 
-		var returnedPullRequest pullRequest
+		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
 		fmt.Println(returnedPullRequest)
