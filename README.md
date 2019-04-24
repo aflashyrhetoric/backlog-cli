@@ -6,7 +6,7 @@ A CLI tool to interact with [Backlog](backlogtool.com), a project management too
 1. Get an api key here: https://nulab.backlog.jp/EditApiSettings.action 
   - For "memo" you can simply put 'backlog-cli' or whatever you'd like.
 2. `make init` will copy the sample configuration file to `$HOME/backlog-config.yaml`
-3. Add the `API_KEY` to the YAML file. This will be the link you visit to use Backlog, e.g: `https://yourbacklogspace.nulab.com`
+3. Add the `API_KEY` to the YAML file.
 4. Add the `BASEURL`. This will be the link you visit to use Backlog, e.g: `https://yourbacklogspace.nulab.com`
   - :rotating_light: Do not use a trailing slash! :rotating_light:
 5. `make` will build the project and add the `blg` executable to `usr/local/bin` directly.
