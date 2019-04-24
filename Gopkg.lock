@@ -100,12 +100,12 @@
   version = "v0.2.0"
 
 [[projects]]
-  digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
+  digest = "1:e0f50a07c0def90588d69f77178712c6fdc67eb6576365f551cce98b44b501bf"
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
-  version = "v1.2.0"
+  revision = "63909f0a90ab0f36909e8e044e46ace10cf13ba2"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
@@ -189,7 +189,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:064d74d9e136de7ce5c4a47ab251a887fb69e2ada13db9cce2687e54f8784596"
+  digest = "1:0cefd456e1c4d101d6ff915dc1c3ae11305b22ddbee6569811fd1b70fd2eece2"
   name = "golang.org/x/crypto"
   packages = [
     "cast5",
@@ -210,7 +210,7 @@
     "ssh/knownhosts",
   ]
   pruneopts = "UT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "d864b10871cd4370fe574816b489c819c675ccc7"
 
 [[projects]]
   branch = "master"
@@ -218,11 +218,11 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "15845e8f865bdabdefb6e7da65b4d9e8de5e94ef"
+  revision = "afa5a82059c6356159f699d81beff22a81842231"
 
 [[projects]]
   branch = "master"
-  digest = "1:78ed3d0c6d5b4996ef2867e280f39ea7b44438558c6331721740ab9061db532c"
+  digest = "1:45c0985630ebeafc0dba3e5fad8ae79ac344250a0d3517da4abcf7bc25a162b6"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -230,7 +230,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "f49334f85ddcf0f08d7fb6dd7363e9e6d6b777eb"
+  revision = "953cdadca894cdc07be76fc99f95b40c28f06623"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
@@ -262,7 +262,7 @@
   version = "v4.3.0"
 
 [[projects]]
-  digest = "1:44801e4be7066a82dc7a7f608d31f99c5c0f5a65a0215b37401a5657ce52940d"
+  digest = "1:7fcf8681ff737e3fa6b387448717283c2053058c5d7344c22a9a025b0dc5be4a"
   name = "gopkg.in/src-d/go-git.v4"
   packages = [
     ".",
@@ -308,8 +308,8 @@
     "utils/merkletrie/noder",
   ]
   pruneopts = "UT"
-  revision = "db6c41c156481962abf9a55a324858674c25ab08"
-  version = "v4.10.0"
+  revision = "aa6f288c256ff8baf8a7745546a9752323dc0d89"
+  version = "v4.11.0"
 
 [[projects]]
   digest = "1:78d374b493e747afa9fbb2119687e3740a7fb8d0ebabddfef0a012593aaecbb3"
