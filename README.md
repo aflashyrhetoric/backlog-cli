@@ -21,3 +21,9 @@ blg --help
 # Test Backlog API_KEY is set up properly with:
 blg me
 ```
+
+## Misc Resources
+
+- To check values and goals, look at value-goals.md
+- [Issues @ Github](https://github.com/aflashyrhetoric/backlog-cli/issues)
+- [Kanban board](https://github.com/aflashyrhetoric/backlog-cli/projects/1)
