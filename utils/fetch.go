@@ -32,8 +32,6 @@ func Post(endpoint string, form url.Values) []byte {
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
 	req.PostForm = form
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	//fmt.Printf(rform was %v", form)
-	//fmt.Println(endpoint)
 
 	// Fetch
 	response, err := hc.Do(req)

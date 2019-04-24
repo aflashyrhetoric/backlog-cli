@@ -39,7 +39,6 @@ var prCmd = &cobra.Command{
 		CurrentBranch := CurrentBranch()
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
 		issueID := string(reg.Find([]byte(CurrentBranch)))
-		fmt.Println(issueID)
 
 		apiURL := "/api/v2/issues/" + string(issueID)
 
@@ -52,8 +51,6 @@ var prCmd = &cobra.Command{
 		}
 
 		endpoint := Endpoint(apiURL)
-		// fmt.Println("Endpoint is:")
-		// fmt.Println(endpoint)
 		responseData := utils.Get(endpoint)
 		json.Unmarshal(responseData, &currentIssue)
 		// Convert integer -> string for use in later functions
@@ -84,7 +81,6 @@ var prCmd = &cobra.Command{
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
-		fmt.Println(returnedPullRequest)
 		currentPullRequestID := strconv.Itoa(returnedPullRequest.Number)
 
 		linkToPR := fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, currentPullRequestID)
