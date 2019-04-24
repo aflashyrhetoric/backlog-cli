@@ -1,10 +1,6 @@
-.PHONY: build build-install moveToBin all
-
-PWD = $(shell pwd)
+.PHONY: init build build-install moveToBin
 
 default: build-install
-
-all: build-install
 
 # FIXME: Later, this should be achievable via blg not Makefile
 init: 
