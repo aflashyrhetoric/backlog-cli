@@ -25,11 +25,9 @@ type PullRequest struct {
 var branchName string
 var currentIssue Issue
 
-// Gets
 var prCmd = &cobra.Command{
 	Use:   "pr",
-	Short: "Creates a Backlog Pull Request for the current branch -> master",
-	Long:  ``,
+	Short: "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------
@@ -58,8 +56,8 @@ var prCmd = &cobra.Command{
 
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
-		p := ProjectKey()
-		r := RepositoryName()
+		p := GlobalConfig.ProjectKey
+		r := GlobalConfig.RepositoryName
 		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
 		//apiURL = "test"

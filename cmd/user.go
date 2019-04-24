@@ -21,11 +21,9 @@ type User struct {
 // CurrentUser ..
 type CurrentUser User
 
-// Gets
 var userCmd = &cobra.Command{
 	Use:   "user",
 	Short: "Returns data about myself",
-	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------

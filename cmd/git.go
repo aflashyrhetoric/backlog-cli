@@ -11,7 +11,6 @@ import (
 var gitCmd = &cobra.Command{
 	Use:   "commit",
 	Short: "Get a link to the latest commit",
-	Long:  `to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 
