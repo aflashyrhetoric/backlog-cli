@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -109,6 +110,19 @@ func Repository() *git.Repository {
 func ProjectKey() string {
 	var cb string
 	cb = CurrentBranch()
+	cb = strings.ToLower(cb)
+	if cb == "staging" || cb == "dev" || cb == "develop" || cb == "beta" {
+		path, err := os.Getwd()
+		ErrorCheck(err)
+		path = strings.ToLower(path)
+		// TODO: FETCH LIST OF PROJECTS FROM BACKLOG AND USE REGULAR EXPRESSIONS AND STRING SIMILARITY ALGORITHM TO MATCH CURRENT WORKING DIRECTORY TO PROJECTKEY
+		// RESTRUCTURE THE PROJECTKEY() FUNCTION TO MAKE IT CLEAR THAT IT USES A CASCADE TO TRY AND DETECT AN ACCURATE KEY
+		// IF ALL ELSE FAILS OFFER A CONFIG-BASED WAY (IN THE YAML FILE) TO SET UP DIRECTORY-BASED PROJECT KEY MATCHING (SEEMS BEST WAY LONG-TERM)
+		reg := regexp.MustCompile(`(.*)-[0-9]+`)
+		projectKeyCapturedString := reg.FindSubmatch([]byte(cb))
+		projectKeyReferenceName := string(projectKeyCapturedString[1])
+		return projectKeyReferenceName
+	}
 	reg := regexp.MustCompile(`(.*)-[0-9]+`)
 	projectKeyCapturedString := reg.FindSubmatch([]byte(cb))
 	projectKeyReferenceName := string(projectKeyCapturedString[1])
