@@ -1,49 +1,92 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+
+	"github.com/aflashyrhetoric/backlog-cli/utils"
+
+	"net/url"
+	"regexp"
+	"strconv"
+
 	"github.com/spf13/cobra"
-	git "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-// prCmd represents the pr command
+// PullRequest .. a PARTIAL struct for a PullRequest on Backlog
+type PullRequest struct {
+	Number      int    `json:"number"`
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
+	Base        string `json:"base"`
+	Branch      string `json:"branch"`
+}
+
+var branchName string
+var currentIssue Issue
+
 var prCmd = &cobra.Command{
 	Use:   "pr",
-	Short: "Creates a Backlog Pull Request for the current branch",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		repo, err := git.PlainOpen("/Users/wdkevo/Nulab/cacoo-blog")
-		if err != nil {
-			fmt.Printf("#%v", err)
-			panic(err)
+		// ---------------------------------------------------------
+
+		// By default, get Issue ID from current branch name if possible
+		// var formContentType := "Content-Type:application/x-www-form-urlencoded"
+		CurrentBranch := CurrentBranch()
+		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
+		issueID := string(reg.Find([]byte(CurrentBranch)))
+
+		apiURL := "/api/v2/issues/" + string(issueID)
+
+		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
+			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
+		} else if CurrentBranch == "0" {
+			fmt.Println("Invalid branch. Try again.")
+		} else {
+			fmt.Printf("Creating PR for %v branch.", CurrentBranch)
 		}
 
-		branches, err := repo.Branches()
-		if err != nil {
-			panic(err)
-		}
+		endpoint := Endpoint(apiURL)
+		responseData := utils.Get(endpoint)
+		json.Unmarshal(responseData, &currentIssue)
+		// Convert integer -> string for use in later functions
+		issueID = strconv.Itoa(currentIssue.ID)
 
-		err = branches.ForEach(referrals)
-		if err != nil {
-			panic(err)
-		}
+		// Create the form, request, and send the POST request
+		// ---------------------------------------------------------
+		p := GlobalConfig.ProjectKey
+		r := GlobalConfig.RepositoryName
+		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
+
+		//apiURL = "test"
+		endpoint = Endpoint(apiURL)
+
+		// Build out Form
+		form := url.Values{}
+		form.Add("summary", "Test summary")
+		form.Add("description", "Test description")
+		// Branch to merge to
+		form.Add("base", branchName)
+		// Branch of branch we are merging
+		form.Add("branch", CurrentBranch)
+		form.Add("issueId", issueID)
+		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
+
+		responseData = utils.Post(endpoint, form)
+
+		var returnedPullRequest PullRequest
+		json.Unmarshal(responseData, &returnedPullRequest)
+
+		currentPullRequestID := strconv.Itoa(returnedPullRequest.Number)
+
+		linkToPR := fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, currentPullRequestID)
+		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
 
 func init() {
+	prCmd.Flags().StringVarP(&branchName, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
 	RootCmd.AddCommand(prCmd)
-}
-
-func referrals(refer *plumbing.Reference) error {
-	fmt.Printf("%#v\n", refer)
-	fmt.Printf("%s\n", refer.Name())
-
-	return nil
 }

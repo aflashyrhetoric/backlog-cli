@@ -1,39 +1,21 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
-	"net/http"
-)
 
-var httpClient *http.Client
+	"github.com/spf13/cobra"
+)
 
 var meCmd = &cobra.Command{
 	Use:   "me",
-	Short: "A brief description of your command",
-	Long:  `to quickly create a Cobra application.`,
+	Short: "Get quick links for the current user",
 
 	Run: func(cmd *cobra.Command, args []string) {
-
-		apiUrl := "/api/v2/users/myself"
-		endpoint := Endpoint(apiUrl)
-
-		// Fetch
-		responseData := get(endpoint)
-
-		// A Response struct to map the Entire Response
-		type User struct {
-			Name     string `json:"name"`
-			Email    string `json:"mailAddress"`
-			Username string `json:"nulabAccount.uniqueId"`
-		}
-
-		var responseObject User
-
-		json.Unmarshal(responseData, &responseObject)
-		fmt.Println(responseObject.Name)
-		fmt.Println(responseObject.Email)
+		currentUser := GetCurrentUser()
+		fmt.Printf("Name: %s\n", currentUser.Name)
+		fmt.Printf("Email: %s\n", currentUser.Email)
+		fmt.Printf("Link to Profile: %s/user/%s\n", GlobalConfig.BaseURL, currentUser.Username)
+		fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", GlobalConfig.BaseURL, currentUser.Username)
 	},
 }
 

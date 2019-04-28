@@ -2,5 +2,12 @@
 env
 .backlog-cli.*
 backlog-cli
+backlog-config.yaml
+config.yaml
 node_modules/
+.idea/*
+*.swp
+*.swo
 vendor
+vendor-*
+_vendor-*
