@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
@@ -22,7 +23,7 @@ type PullRequest struct {
 	Branch      string `json:"branch"`
 }
 
-var branchName string
+var BaseBranch string
 var currentIssue Issue
 
 var prCmd = &cobra.Command{
@@ -36,16 +37,22 @@ var prCmd = &cobra.Command{
 		// var formContentType := "Content-Type:application/x-www-form-urlencoded"
 		CurrentBranch := CurrentBranch()
 		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
-		issueID := string(reg.Find([]byte(CurrentBranch)))
+
+		var issueID string
+
+		if reg.Find([]byte(CurrentBranch)) != nil {
+			issueID = string(reg.Find([]byte(CurrentBranch)))
+		}
 
 		apiURL := "/api/v2/issues/" + string(issueID)
 
 		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
-			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
+			fmt.Printf("CAUTION: You are on %s.\n", CurrentBranch)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
 		} else if CurrentBranch == "0" {
 			fmt.Println("Invalid branch. Try again.")
 		} else {
-			fmt.Printf("Creating PR for %v branch.", CurrentBranch)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
 		}
 
 		endpoint := Endpoint(apiURL)
@@ -65,16 +72,21 @@ var prCmd = &cobra.Command{
 
 		// Build out Form
 		form := url.Values{}
-		form.Add("summary", "Test summary")
+		form.Add("summary", fmt.Sprintf("Test summary: %v", time.Now()))
 		form.Add("description", "Test description")
 		// Branch to merge to
-		form.Add("base", branchName)
+		form.Add("base", BaseBranch)
 		// Branch of branch we are merging
 		form.Add("branch", CurrentBranch)
-		form.Add("issueId", issueID)
 		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
 
-		responseData = utils.Post(endpoint, form)
+		// Add issueID if it exists
+		if issueID != "0" {
+			form.Add("issueId", issueID)
+		}
+
+		responseData, err := utils.Post(endpoint, form)
+		ErrorPanic(err)
 
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
@@ -87,6 +99,6 @@ var prCmd = &cobra.Command{
 }
 
 func init() {
-	prCmd.Flags().StringVarP(&branchName, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
+	prCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
 	RootCmd.AddCommand(prCmd)
 }

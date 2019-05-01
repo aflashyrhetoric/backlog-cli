@@ -28,21 +28,19 @@ func Get(endpoint string) []byte {
 	return responseData
 }
 
-func Post(endpoint string, form url.Values) []byte {
+func Post(endpoint string, form url.Values) ([]byte, error) {
+
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
 	req.PostForm = form
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	// Fetch
 	response, err := hc.Do(req)
-	if err != nil {
-		panic(err)
-	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return responseData
+	return responseData, err
 }
