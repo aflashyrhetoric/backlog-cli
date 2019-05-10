@@ -13,6 +13,19 @@ import (
 var configFile string
 var hc = http.Client{}
 
+// Error .. an error returned from the API
+type Error struct {
+	Message  string `json:"message"`
+	Code     int    `json:"code"`
+	MoreInfo string `json:"moreInfo"`
+}
+
+// ErrorsList .. a list of errors returned from the API
+type ErrorsList struct {
+	errorList []Error
+}
+
+// Get .. issues an HTTP GET request
 func Get(endpoint string) []byte {
 	response, err := http.Get(endpoint)
 	if err != nil {
@@ -28,6 +41,7 @@ func Get(endpoint string) []byte {
 	return responseData
 }
 
+// Post .. issues an HTTP POST request
 func Post(endpoint string, form url.Values) ([]byte, error) {
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
@@ -36,6 +50,9 @@ func Post(endpoint string, form url.Values) ([]byte, error) {
 
 	// Fetch
 	response, err := hc.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
