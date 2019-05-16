@@ -9,7 +9,7 @@ import (
 
 // FIXME: 'commit' should be a child of `git`, or in its own file, etc
 var gitCmd = &cobra.Command{
-	Use:   "commit",
+	Use:   "latest-commit",
 	Short: "Get a link to the latest commit",
 
 	Run: func(cmd *cobra.Command, args []string) {
