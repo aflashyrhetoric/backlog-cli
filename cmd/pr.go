@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
@@ -16,16 +19,21 @@ import (
 
 // PullRequest .. a PARTIAL struct for a PullRequest on Backlog
 type PullRequest struct {
-	Number      int    `json:"number"`
-	Summary     string `json:"summary"`
-	Description string `json:"description"`
-	Base        string `json:"base"`
-	Branch      string `json:"branch"`
-	Issue       Issue  `json:"issue"`
+	Number      int               `json:"number"`
+	Summary     string            `json:"summary"`
+	Description string            `json:"description"`
+	Base        string            `json:"base"`
+	Branch      string            `json:"branch"`
+	Issue       Issue             `json:"issue"`
+	Status      pullRequestStatus `json:"status"`
+}
+
+type pullRequestStatus struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 var BaseBranch string
-var currentIssue Issue
 
 var prCmd = &cobra.Command{
 	Use:   "pr",
@@ -47,18 +55,11 @@ var prCmd = &cobra.Command{
 
 		apiURL := "/api/v2/issues/" + string(issueID)
 
-		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
-			fmt.Printf("CAUTION: You are on %s.\n", CurrentBranch)
-			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
-		} else if CurrentBranch == "0" {
-			fmt.Println("Invalid branch. Try again.")
-		} else {
-			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
-		}
-
 		// Get Issue Data
 		endpoint := Endpoint(apiURL)
 		responseData := utils.Get(endpoint)
+
+		var currentIssue Issue
 		json.Unmarshal(responseData, &currentIssue)
 		// Convert integer -> string for use in later functions
 		GlobalConfig.setIssue(currentIssue)
@@ -75,13 +76,26 @@ var prCmd = &cobra.Command{
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
 		if len(existingPRs) > 0 {
-			fmt.Println("Existing Pull Requests found:")
-			for i, pr := range existingPRs {
-				fmt.Printf("%v: %s", i, getPRLink(pr.Issue))
+			listPRs(existingPRs)
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n)")
+			text, _ := reader.ReadString('\n')
+			text = strings.TrimSpace(text)
+
+			if text != "y" {
+				return
 			}
 		}
 
-		return
+		// Proceed with PR creation
+		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
+			fmt.Printf("CAUTION: You are on %s.\n", CurrentBranch)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
+		} else if CurrentBranch == "0" {
+			fmt.Println("Invalid branch. Try again.")
+		} else {
+			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
+		}
 
 		// Build out Form
 		form := url.Values{}
@@ -104,15 +118,25 @@ var prCmd = &cobra.Command{
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
-		currentPullRequestID := Issue{ID: returnedPullRequest.Number}
-
-		linkToPR := getPRLink(currentPullRequestID)
+		linkToPR := getPRLink(returnedPullRequest.Number)
 		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
 
-func getPRLink(issueID Issue) string {
-	return fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, issueID)
+func listPRs(PRList []PullRequest) {
+	fmt.Printf("\n\n[Existing Pull Requests found]\n")
+	for i, pr := range PRList {
+
+		// If there are open PRs with a matching issue ID
+		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
+			fmt.Printf("\t%v: %s\n", i+1, getPRLink(pr.Number))
+		}
+	}
+
+}
+
+func getPRLink(n int) string {
+	return fmt.Sprintf("%s/git/%s/%s/pullRequests/%d", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, n)
 }
 
 func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
@@ -128,8 +152,8 @@ func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
 	ErrorCheck(err)
 
 	for _, element := range returnedPullRequests {
-		fmt.Println(GlobalConfig.CurrentIssue)
-		fmt.Println(element)
+		// fmt.Println(GlobalConfig.CurrentIssue)
+		// fmt.Println(element)
 		if element.Issue.ID == GlobalConfig.CurrentIssue.ID {
 			existingPullRequests = append(existingPullRequests, element)
 		}
