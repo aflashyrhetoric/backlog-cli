@@ -107,6 +107,7 @@ func listPRs(PRList []PullRequest) {
 		// If there are open PRs with a matching issue ID
 		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
 			fmt.Printf("\t%v: %s\n", count, getPRLink(pr.Number))
+			fmt.Printf("\t[%s] --> [%s]\n", pr.Branch, pr.Base)
 			count++
 		}
 	}

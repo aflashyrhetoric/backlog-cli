@@ -103,7 +103,7 @@ func CurrentIssue() Issue {
 	var currentIssue Issue
 	json.Unmarshal(responseData, &currentIssue)
 	// Convert integer -> string for use in later functions
-	GlobalConfig.setIssue(currentIssue)
+	// GlobalConfig.setIssue(currentIssue)
 	return currentIssue
 }
 

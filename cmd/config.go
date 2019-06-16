@@ -17,16 +17,3 @@ type Config struct {
 	CurrentIssue   Issue
 	DebugMode      bool
 }
-
-// Helper to set the User to the GlobalConfig
-func (c *Config) setUser(user User) {
-	c.User = user
-}
-
-func (c *Config) setBranch(branch string) {
-	c.CurrentBranch = branch
-}
-
-func (c *Config) setIssue(issue Issue) {
-	c.CurrentIssue = issue
-}
