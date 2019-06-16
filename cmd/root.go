@@ -64,12 +64,12 @@ func initConfig() {
 			ProjectKey:     ProjectKey(),
 			Repository:     Repository(),
 			RepositoryName: RepositoryName(),
-			CurrentBranch:  CurrentBranch(),
+			CurrentBranch:  GetCurrentBranch(),
 		}
 
-		// Configuration that requires network, call them later
-		CurrentIssue()
-		GetCurrentUser()
+		// Configuration that requires HTTP, call them later
+		GlobalConfig.CurrentIssue = CurrentIssue()
+		GlobalConfig.User = GetCurrentUser()
 
 	} else {
 		fmt.Println("Config not found. Please create a config at $HOME/backlog-config.yaml")
@@ -88,7 +88,7 @@ func CurrentIssue() Issue {
 	var issueID string
 
 	// By default, get Issue ID from current branch name if possible
-	cb := CurrentBranch()
+	cb := GetCurrentBranch()
 	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
 	if reg.Find([]byte(cb)) != nil {
 		issueID = string(reg.Find([]byte(cb)))
@@ -103,12 +103,11 @@ func CurrentIssue() Issue {
 	var currentIssue Issue
 	json.Unmarshal(responseData, &currentIssue)
 	// Convert integer -> string for use in later functions
-	// GlobalConfig.setIssue(currentIssue)
 	return currentIssue
 }
 
 // CurrentBranch .. Gets current branch name.
-func CurrentBranch() string {
+func GetCurrentBranch() string {
 	var path string
 	path, err := os.Getwd()
 	if err != nil {
