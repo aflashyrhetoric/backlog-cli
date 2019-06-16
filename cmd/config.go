@@ -15,6 +15,7 @@ type Config struct {
 	RepositoryName string
 	CurrentBranch  string
 	CurrentIssue   Issue
+	DebugMode      bool
 }
 
 // Helper to set the User to the GlobalConfig

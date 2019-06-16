@@ -54,7 +54,9 @@ func initConfig() {
 
 	// FIXME: Remove debug info for production build
 	if configFile != "" {
-		fmt.Printf("Config found. Loaded %s\n", configFile)
+		if debugMode() {
+			fmt.Printf("Config found. Loaded %s\n", configFile)
+		}
 
 		GlobalConfig = Config{
 			BaseURL:        viper.GetString("BASEURL"),
@@ -74,6 +76,10 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv()
+}
+
+func debugMode() bool {
+	return viper.GetString("DEBUG_MODE") == "true"
 }
 
 // CurrentIssue .. Returns the current issue
