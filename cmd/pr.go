@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
@@ -99,8 +98,8 @@ var prCmd = &cobra.Command{
 
 		// Build out Form
 		form := url.Values{}
-		form.Add("summary", fmt.Sprintf("Test summary: %v", time.Now()))
-		form.Add("description", "Test description")
+		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary))
+		form.Add("description", GlobalConfig.CurrentIssue.Description)
 		// Branch to merge to
 		form.Add("base", BaseBranch)
 		// Branch of branch we are merging
@@ -125,11 +124,13 @@ var prCmd = &cobra.Command{
 
 func listPRs(PRList []PullRequest) {
 	fmt.Printf("\n\n[Existing Pull Requests found]\n")
-	for i, pr := range PRList {
+	count := 1
+	for _, pr := range PRList {
 
 		// If there are open PRs with a matching issue ID
 		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
-			fmt.Printf("\t%v: %s\n", i+1, getPRLink(pr.Number))
+			fmt.Printf("\t%v: %s\n", count, getPRLink(pr.Number))
+			count++
 		}
 	}
 
