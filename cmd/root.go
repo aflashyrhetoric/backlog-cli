@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
 
+	"github.com/aflashyrhetoric/backlog-cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -63,6 +65,8 @@ func initConfig() {
 			CurrentBranch:  CurrentBranch(),
 		}
 
+		// Configuration that requires network, call them later
+		CurrentIssue()
 		GetCurrentUser()
 
 	} else {
@@ -70,6 +74,31 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv()
+}
+
+// CurrentIssue .. Returns the current issue
+func CurrentIssue() Issue {
+
+	var issueID string
+
+	// By default, get Issue ID from current branch name if possible
+	cb := CurrentBranch()
+	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
+	if reg.Find([]byte(cb)) != nil {
+		issueID = string(reg.Find([]byte(cb)))
+	}
+	apiURL := "/api/v2/issues/" + string(issueID)
+
+	// Get Issue Data
+	endpoint := Endpoint(apiURL)
+
+	responseData := utils.Get(endpoint)
+
+	var currentIssue Issue
+	json.Unmarshal(responseData, &currentIssue)
+	// Convert integer -> string for use in later functions
+	GlobalConfig.setIssue(currentIssue)
+	return currentIssue
 }
 
 // CurrentBranch .. Gets current branch name.
@@ -105,7 +134,7 @@ func Repository() *git.Repository {
 	return repo
 }
 
-// ProjectKey ... Returns the project key for the configuration
+// ProjectKey ... Returns the project key for the configuration (e.g "MARKETING")
 func ProjectKey() string {
 	repo := Repository()
 

@@ -10,7 +10,6 @@ import (
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 
 	"net/url"
-	"regexp"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -41,36 +40,13 @@ var prCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		// By default, get Issue ID from current branch name if possible
-		// var formContentType := "Content-Type:application/x-www-form-urlencoded"
-		CurrentBranch := CurrentBranch()
-		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
-
-		var issueID string
-
-		if reg.Find([]byte(CurrentBranch)) != nil {
-			issueID = string(reg.Find([]byte(CurrentBranch)))
-		}
-
-		apiURL := "/api/v2/issues/" + string(issueID)
-
-		// Get Issue Data
-		endpoint := Endpoint(apiURL)
-		responseData := utils.Get(endpoint)
-
-		var currentIssue Issue
-		json.Unmarshal(responseData, &currentIssue)
-		// Convert integer -> string for use in later functions
-		GlobalConfig.setIssue(currentIssue)
-
-		// Create the form, request, and send the POST request
-		// ---------------------------------------------------------
+		cb := GlobalConfig.CurrentBranch
 		p := GlobalConfig.ProjectKey
 		r := GlobalConfig.RepositoryName
-		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
+		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
 		//apiURL = "test"
-		endpoint = Endpoint(apiURL)
+		endpoint := Endpoint(apiURL)
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
@@ -87,23 +63,24 @@ var prCmd = &cobra.Command{
 		}
 
 		// Proceed with PR creation
-		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
-			fmt.Printf("CAUTION: You are on %s.\n", CurrentBranch)
-			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
-		} else if CurrentBranch == "0" {
+		if cb == "staging" || cb == "dev" || cb == "develop" || cb == "beta" {
+			fmt.Printf("CAUTION: You are on %s.\n", cb)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", cb, BaseBranch)
+		} else if cb == "0" {
 			fmt.Println("Invalid branch. Try again.")
 		} else {
-			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", cb, BaseBranch)
 		}
 
-		// Build out Form
+		// Create the form, request, and send the POST request
+		// ---------------------------------------------------------
 		form := url.Values{}
 		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary))
 		form.Add("description", GlobalConfig.CurrentIssue.Description)
 		// Branch to merge to
 		form.Add("base", BaseBranch)
 		// Branch of branch we are merging
-		form.Add("branch", CurrentBranch)
+		form.Add("branch", cb)
 		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
 
 		// Add issueID if it exists
@@ -111,7 +88,7 @@ var prCmd = &cobra.Command{
 			form.Add("issueId", strconv.Itoa(GlobalConfig.CurrentIssue.ID))
 		}
 
-		responseData, err = utils.Post(endpoint, form)
+		responseData, err := utils.Post(endpoint, form)
 		ErrorPanic(err)
 
 		var returnedPullRequest PullRequest

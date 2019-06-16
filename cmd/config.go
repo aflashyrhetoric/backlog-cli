@@ -22,6 +22,10 @@ func (c *Config) setUser(user User) {
 	c.User = user
 }
 
+func (c *Config) setBranch(branch string) {
+	c.CurrentBranch = branch
+}
+
 func (c *Config) setIssue(issue Issue) {
 	c.CurrentIssue = issue
 }
