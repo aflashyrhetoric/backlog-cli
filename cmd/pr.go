@@ -21,6 +21,7 @@ type PullRequest struct {
 	Description string `json:"description"`
 	Base        string `json:"base"`
 	Branch      string `json:"branch"`
+	Issue       Issue  `json:"issue"`
 }
 
 var BaseBranch string
@@ -55,11 +56,12 @@ var prCmd = &cobra.Command{
 			fmt.Printf("Creating PR: %s --> %s branch.\n", CurrentBranch, BaseBranch)
 		}
 
+		// Get Issue Data
 		endpoint := Endpoint(apiURL)
 		responseData := utils.Get(endpoint)
 		json.Unmarshal(responseData, &currentIssue)
 		// Convert integer -> string for use in later functions
-		issueID = strconv.Itoa(currentIssue.ID)
+		GlobalConfig.setIssue(currentIssue)
 
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
@@ -69,6 +71,17 @@ var prCmd = &cobra.Command{
 
 		//apiURL = "test"
 		endpoint = Endpoint(apiURL)
+
+		existingPRs, err := checkForExistingPullRequests(endpoint)
+
+		if len(existingPRs) > 0 {
+			fmt.Println("Existing Pull Requests found:")
+			for i, pr := range existingPRs {
+				fmt.Printf("%v: %s", i, getPRLink(pr.Issue))
+			}
+		}
+
+		return
 
 		// Build out Form
 		form := url.Values{}
@@ -81,21 +94,48 @@ var prCmd = &cobra.Command{
 		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
 
 		// Add issueID if it exists
-		if issueID != "0" {
-			form.Add("issueId", issueID)
+		if GlobalConfig.CurrentIssue.ID != 0 {
+			form.Add("issueId", strconv.Itoa(GlobalConfig.CurrentIssue.ID))
 		}
 
-		responseData, err := utils.Post(endpoint, form)
+		responseData, err = utils.Post(endpoint, form)
 		ErrorPanic(err)
 
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
-		currentPullRequestID := strconv.Itoa(returnedPullRequest.Number)
+		currentPullRequestID := Issue{ID: returnedPullRequest.Number}
 
-		linkToPR := fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, currentPullRequestID)
+		linkToPR := getPRLink(currentPullRequestID)
 		fmt.Printf("Link to PR: %s", linkToPR)
 	},
+}
+
+func getPRLink(issueID Issue) string {
+	return fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, issueID)
+}
+
+func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
+	responseData := utils.Get(endpoint)
+
+	// List of Pull Requests that already exist and share the ID
+	var existingPullRequests []PullRequest
+
+	// List of returned pull requests
+	var returnedPullRequests []PullRequest
+	err := json.Unmarshal(responseData, &returnedPullRequests)
+
+	ErrorCheck(err)
+
+	for _, element := range returnedPullRequests {
+		fmt.Println(GlobalConfig.CurrentIssue)
+		fmt.Println(element)
+		if element.Issue.ID == GlobalConfig.CurrentIssue.ID {
+			existingPullRequests = append(existingPullRequests, element)
+		}
+	}
+
+	return existingPullRequests, err
 }
 
 func init() {
