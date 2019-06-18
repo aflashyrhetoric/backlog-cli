@@ -74,8 +74,6 @@ var prCmd = &cobra.Command{
 			e.Printf("Creating PR: %s --> %s branch. :zap: \n", cb, BaseBranch)
 		}
 
-		return
-
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
 		form := url.Values{}
