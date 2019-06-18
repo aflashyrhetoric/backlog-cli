@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
+	e "github.com/kyokomi/emoji"
+	a "github.com/logrusorgru/aurora"
 
 	"net/url"
 	"strconv"
@@ -53,7 +55,7 @@ var prCmd = &cobra.Command{
 		if len(existingPRs) > 0 {
 			listPRs(existingPRs)
 			reader := bufio.NewReader(os.Stdin)
-			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n)")
+			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n) ")
 			text, _ := reader.ReadString('\n')
 			text = strings.TrimSpace(text)
 
@@ -64,13 +66,15 @@ var prCmd = &cobra.Command{
 
 		// Proceed with PR creation
 		if cb == "staging" || cb == "dev" || cb == "develop" || cb == "beta" {
-			fmt.Printf("CAUTION: You are on %s.\n", cb)
+			e.Printf(":rotating_light: CAUTION: You are on %s.\n", cb)
 			fmt.Printf("Creating PR: %s --> %s branch.\n", cb, BaseBranch)
 		} else if cb == "0" {
 			fmt.Println("Invalid branch. Try again.")
 		} else {
-			fmt.Printf("Creating PR: %s --> %s branch.\n", cb, BaseBranch)
+			e.Printf("Creating PR: %s --> %s branch. :zap: \n", cb, BaseBranch)
 		}
+
+		return
 
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
@@ -100,14 +104,15 @@ var prCmd = &cobra.Command{
 }
 
 func listPRs(PRList []PullRequest) {
-	fmt.Printf("\n\n[Existing Pull Requests found]\n")
+	e.Print("\n\n:hand:")
+	fmt.Println(a.White("[Existing Pull Requests found]").BgBrightBlack())
 	count := 1
 	for _, pr := range PRList {
 
 		// If there are open PRs with a matching issue ID
 		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
-			fmt.Printf("\t%v: %s\n", count, getPRLink(pr.Number))
-			fmt.Printf("\t[%s] --> [%s]\n", pr.Branch, pr.Base)
+			fmt.Printf("%v: %s\n", count, getPRLink(pr.Number))
+			fmt.Printf("   %s %s %s\n", a.Cyan(pr.Branch), a.Bold("-->"), a.Cyan(pr.Base))
 			count++
 		}
 	}
@@ -119,7 +124,13 @@ func getPRLink(n int) string {
 }
 
 func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
-	responseData := utils.Get(endpoint)
+
+	// params for pull requests
+	params := map[string]int{
+		"statusId[]": 1,
+	}
+
+	responseData := utils.GetParams(endpoint, params)
 
 	// List of Pull Requests that already exist and share the ID
 	var existingPullRequests []PullRequest
