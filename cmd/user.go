@@ -52,8 +52,6 @@ func GetCurrentUser() User {
 	var returnedUser User
 	json.Unmarshal(responseData, &returnedUser)
 
-	GlobalConfig.setUser(returnedUser)
-
 	return returnedUser
 }
 

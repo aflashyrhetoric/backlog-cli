@@ -68,6 +68,22 @@
   version = "0.5"
 
 [[projects]]
+  digest = "1:ea7929b5ce35b109685e5c992ddf64d5b977cd915b2c050fc340d7d645c87418"
+  name = "github.com/kyokomi/emoji"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "eba9a9d7bfd64dcfe6e90fb3d53b2f3357a015c3"
+  version = "v2.1.0"
+
+[[projects]]
+  digest = "1:ba852707958e39694e7f64328008287892adf9b1aed0174480e2f50e0c23e521"
+  name = "github.com/logrusorgru/aurora"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "21d75270181e0436fee7bd58b991c212cf309068"
+  version = "v2.0"
+
+[[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -331,6 +347,8 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/kyokomi/emoji",
+    "github.com/logrusorgru/aurora",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "gopkg.in/src-d/go-git.v4",

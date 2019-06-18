@@ -1,4 +1,4 @@
-.PHONY: init build build-install moveToBin
+.PHONY: init build build-install deps
 
 default: build-install
 
@@ -11,3 +11,6 @@ build:
 
 build-install:
 	go build -o /usr/local/bin/blg *.go
+
+deps:
+	dep ensure -v

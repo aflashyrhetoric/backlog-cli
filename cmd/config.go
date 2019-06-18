@@ -14,9 +14,19 @@ type Config struct {
 	Repository     *git.Repository
 	RepositoryName string
 	CurrentBranch  string
+	CurrentIssue   Issue
+	DebugMode      bool
 }
 
 // Helper to set the User to the GlobalConfig
-func (u *Config) setUser(user User) {
-	u.User = user
+func (c *Config) setUser(user User) {
+	c.User = user
+}
+
+func (c *Config) setBranch(branch string) {
+	c.CurrentBranch = branch
+}
+
+func (c *Config) setIssue(issue Issue) {
+	c.CurrentIssue = issue
 }

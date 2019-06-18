@@ -1,13 +1,17 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
+	e "github.com/kyokomi/emoji"
+	a "github.com/logrusorgru/aurora"
 
 	"net/url"
-	"regexp"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -15,15 +19,21 @@ import (
 
 // PullRequest .. a PARTIAL struct for a PullRequest on Backlog
 type PullRequest struct {
-	Number      int    `json:"number"`
-	Summary     string `json:"summary"`
-	Description string `json:"description"`
-	Base        string `json:"base"`
-	Branch      string `json:"branch"`
+	Number      int               `json:"number"`
+	Summary     string            `json:"summary"`
+	Description string            `json:"description"`
+	Base        string            `json:"base"`
+	Branch      string            `json:"branch"`
+	Issue       Issue             `json:"issue"`
+	Status      pullRequestStatus `json:"status"`
 }
 
-var branchName string
-var currentIssue Issue
+type pullRequestStatus struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+var BaseBranch string
 
 var prCmd = &cobra.Command{
 	Use:   "pr",
@@ -32,61 +42,117 @@ var prCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		// By default, get Issue ID from current branch name if possible
-		// var formContentType := "Content-Type:application/x-www-form-urlencoded"
-		CurrentBranch := CurrentBranch()
-		reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
-		issueID := string(reg.Find([]byte(CurrentBranch)))
+		cb := GlobalConfig.CurrentBranch
+		p := GlobalConfig.ProjectKey
+		r := GlobalConfig.RepositoryName
+		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		apiURL := "/api/v2/issues/" + string(issueID)
+		//apiURL = "test"
+		endpoint := Endpoint(apiURL)
 
-		if CurrentBranch == "staging" || CurrentBranch == "dev" || CurrentBranch == "develop" || CurrentBranch == "beta" {
-			fmt.Printf("You're currently on the %v branch. Please switch to an issue branch and try again.", issueID)
-		} else if CurrentBranch == "0" {
-			fmt.Println("Invalid branch. Try again.")
-		} else {
-			fmt.Printf("Creating PR for %v branch.", CurrentBranch)
+		existingPRs, err := checkForExistingPullRequests(endpoint)
+
+		if len(existingPRs) > 0 {
+			listPRs(existingPRs)
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n) ")
+			text, _ := reader.ReadString('\n')
+			text = strings.TrimSpace(text)
+
+			if text != "y" {
+				return
+			}
 		}
 
-		endpoint := Endpoint(apiURL)
-		responseData := utils.Get(endpoint)
-		json.Unmarshal(responseData, &currentIssue)
-		// Convert integer -> string for use in later functions
-		issueID = strconv.Itoa(currentIssue.ID)
+		// Proceed with PR creation
+		if cb == "staging" || cb == "dev" || cb == "develop" || cb == "beta" {
+			e.Printf(":rotating_light: CAUTION: You are on %s.\n", cb)
+			fmt.Printf("Creating PR: %s --> %s branch.\n", cb, BaseBranch)
+		} else if cb == "0" {
+			fmt.Println("Invalid branch. Try again.")
+		} else {
+			e.Printf("Creating PR: %s --> %s branch. :zap: \n", cb, BaseBranch)
+		}
+
+		return
 
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
-		p := GlobalConfig.ProjectKey
-		r := GlobalConfig.RepositoryName
-		apiURL = "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
-
-		//apiURL = "test"
-		endpoint = Endpoint(apiURL)
-
-		// Build out Form
 		form := url.Values{}
-		form.Add("summary", "Test summary")
-		form.Add("description", "Test description")
+		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary))
+		form.Add("description", GlobalConfig.CurrentIssue.Description)
 		// Branch to merge to
-		form.Add("base", branchName)
+		form.Add("base", BaseBranch)
 		// Branch of branch we are merging
-		form.Add("branch", CurrentBranch)
-		form.Add("issueId", issueID)
+		form.Add("branch", cb)
 		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
 
-		responseData = utils.Post(endpoint, form)
+		// Add issueID if it exists
+		if GlobalConfig.CurrentIssue.ID != 0 {
+			form.Add("issueId", strconv.Itoa(GlobalConfig.CurrentIssue.ID))
+		}
+
+		responseData, err := utils.Post(endpoint, form)
+		ErrorPanic(err)
 
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
-		currentPullRequestID := strconv.Itoa(returnedPullRequest.Number)
-
-		linkToPR := fmt.Sprintf("%s/git/%s/%s/pullRequests/%s", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, currentPullRequestID)
+		linkToPR := getPRLink(returnedPullRequest.Number)
 		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
 
+func listPRs(PRList []PullRequest) {
+	e.Print("\n\n:hand:")
+	fmt.Println(a.White("[Existing Pull Requests found]").BgBrightBlack())
+	count := 1
+	for _, pr := range PRList {
+
+		// If there are open PRs with a matching issue ID
+		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
+			fmt.Printf("%v: %s\n", count, getPRLink(pr.Number))
+			fmt.Printf("   %s %s %s\n", a.Cyan(pr.Branch), a.Bold("-->"), a.Cyan(pr.Base))
+			count++
+		}
+	}
+
+}
+
+func getPRLink(n int) string {
+	return fmt.Sprintf("%s/git/%s/%s/pullRequests/%d", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, n)
+}
+
+func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
+
+	// params for pull requests
+	params := map[string]int{
+		"statusId[]": 1,
+	}
+
+	responseData := utils.GetParams(endpoint, params)
+
+	// List of Pull Requests that already exist and share the ID
+	var existingPullRequests []PullRequest
+
+	// List of returned pull requests
+	var returnedPullRequests []PullRequest
+	err := json.Unmarshal(responseData, &returnedPullRequests)
+
+	ErrorCheck(err)
+
+	for _, element := range returnedPullRequests {
+		// fmt.Println(GlobalConfig.CurrentIssue)
+		// fmt.Println(element)
+		if element.Issue.ID == GlobalConfig.CurrentIssue.ID {
+			existingPullRequests = append(existingPullRequests, element)
+		}
+	}
+
+	return existingPullRequests, err
+}
+
 func init() {
-	prCmd.Flags().StringVarP(&branchName, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
+	prCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
 	RootCmd.AddCommand(prCmd)
 }

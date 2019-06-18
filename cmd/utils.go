@@ -30,3 +30,12 @@ func ErrorPanic(err error) {
 		panic(err)
 	}
 }
+
+// Truncate .. truncates a string to its max
+func Truncate(s string) string {
+	max := 45
+	if len(s) >= max {
+		return s[0:max]
+	}
+	return s
+}

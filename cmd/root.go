@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
 
+	"github.com/aflashyrhetoric/backlog-cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -53,7 +54,9 @@ func initConfig() {
 
 	// FIXME: Remove debug info for production build
 	if configFile != "" {
-		fmt.Printf("Config found. Loaded %s\n", configFile)
+		if debugMode() {
+			fmt.Printf("Config found. Loaded %s\n", configFile)
+		}
 
 		GlobalConfig = Config{
 			BaseURL:        viper.GetString("BASEURL"),
@@ -61,10 +64,12 @@ func initConfig() {
 			ProjectKey:     ProjectKey(),
 			Repository:     Repository(),
 			RepositoryName: RepositoryName(),
-			CurrentBranch:  CurrentBranch(),
+			CurrentBranch:  GetCurrentBranch(),
 		}
 
-		GetCurrentUser()
+		// Configuration that requires HTTP, call them later
+		GlobalConfig.CurrentIssue = CurrentIssue()
+		GlobalConfig.User = GetCurrentUser()
 
 	} else {
 		fmt.Println("Config not found. Please create a config at $HOME/backlog-config.yaml")
@@ -73,8 +78,36 @@ func initConfig() {
 	viper.AutomaticEnv()
 }
 
+func debugMode() bool {
+	return viper.GetString("DEBUG_MODE") == "true"
+}
+
+// CurrentIssue .. Returns the current issue
+func CurrentIssue() Issue {
+
+	var issueID string
+
+	// By default, get Issue ID from current branch name if possible
+	cb := GetCurrentBranch()
+	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
+	if reg.Find([]byte(cb)) != nil {
+		issueID = string(reg.Find([]byte(cb)))
+	}
+	apiURL := "/api/v2/issues/" + string(issueID)
+
+	// Get Issue Data
+	endpoint := Endpoint(apiURL)
+
+	responseData := utils.Get(endpoint)
+
+	var currentIssue Issue
+	json.Unmarshal(responseData, &currentIssue)
+	// Convert integer -> string for use in later functions
+	return currentIssue
+}
+
 // CurrentBranch .. Gets current branch name.
-func CurrentBranch() string {
+func GetCurrentBranch() string {
 	var path string
 	path, err := os.Getwd()
 	if err != nil {
@@ -106,27 +139,23 @@ func Repository() *git.Repository {
 	return repo
 }
 
-// ProjectKey ... Returns the project key for the configuration
+// ProjectKey ... Returns the project key for the configuration (e.g "MARKETING")
 func ProjectKey() string {
-	var cb string
-	cb = CurrentBranch()
-	cb = strings.ToLower(cb)
-	if cb == "staging" || cb == "dev" || cb == "develop" || cb == "beta" {
-		path, err := os.Getwd()
-		ErrorCheck(err)
-		path = strings.ToLower(path)
-		// TODO: FETCH LIST OF PROJECTS FROM BACKLOG AND USE REGULAR EXPRESSIONS AND STRING SIMILARITY ALGORITHM TO MATCH CURRENT WORKING DIRECTORY TO PROJECTKEY
-		// RESTRUCTURE THE PROJECTKEY() FUNCTION TO MAKE IT CLEAR THAT IT USES A CASCADE TO TRY AND DETECT AN ACCURATE KEY
-		// IF ALL ELSE FAILS OFFER A CONFIG-BASED WAY (IN THE YAML FILE) TO SET UP DIRECTORY-BASED PROJECT KEY MATCHING (SEEMS BEST WAY LONG-TERM)
-		reg := regexp.MustCompile(`(.*)-[0-9]+`)
-		projectKeyCapturedString := reg.FindSubmatch([]byte(cb))
-		projectKeyReferenceName := string(projectKeyCapturedString[1])
-		return projectKeyReferenceName
-	}
-	reg := regexp.MustCompile(`(.*)-[0-9]+`)
-	projectKeyCapturedString := reg.FindSubmatch([]byte(cb))
-	projectKeyReferenceName := string(projectKeyCapturedString[1])
-	return projectKeyReferenceName
+	repo := Repository()
+
+	// Open the 'origin' remote
+	originRemote, err := repo.Remote("origin")
+	ErrorCheck(err)
+
+	// Fetch references from 'origin'
+	repoReferences := originRemote.String()
+
+	// Capture repository name from reference
+	reg := regexp.MustCompile(`\/([A-Z]*)\/(.*)\.git`)
+	repositoryCapturedString := reg.FindSubmatch([]byte(repoReferences))
+	projectKey := string(repositoryCapturedString[1])
+
+	return projectKey
 }
 
 // RepositoryName ... returns current repository name
