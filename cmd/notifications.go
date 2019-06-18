@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 	"github.com/manifoldco/promptui"
@@ -13,11 +12,12 @@ import (
 
 // Notification .. a PARTIAL struct for a Notification
 type Notification struct {
-	ID          int                     `json:"id"`
-	Sender      notificationSender      `json:"sender"`
-	Comment     notificationComment     `json:"comment"`
-	PullRequest notificationPullRequest `json:"pullRequestComment"`
-	content     string
+	ID                 int                            `json:"id"`
+	Sender             notificationSender             `json:"sender"`
+	Comment            notificationComment            `json:"comment"`
+	PullRequestComment notificationPullRequestComment `json:"pullRequestComment"`
+	Reason             int                            `json:"reason"`
+	Content            string
 }
 
 // NotificationSender..
@@ -27,7 +27,7 @@ type notificationSender struct {
 type notificationComment struct {
 	Content string `json:"content"`
 }
-type notificationPullRequest struct {
+type notificationPullRequestComment struct {
 	Content string `json:"content"`
 }
 
@@ -54,51 +54,25 @@ var notifCmd = &cobra.Command{
 		var transformedNotifs []Notification
 
 		for _, n := range returnedNotifs {
-
-			if len(n.PullRequest.Content) > 0 {
-				n.content = n.PullRequest.Content[:5]
-			}
-			if len(n.Comment.Content) > 0 {
-				n.content = n.Comment.Content[:5]
-			}
-
-			fmt.Print(n)
+			n.truncateName()
 			transformedNotifs = append(transformedNotifs, n)
 		}
-
-		returnedNotifs = transformedNotifs
 
 		templates := &promptui.SelectTemplates{
 			Label:    "{{ .Sender.Name }}",
 			Active:   "-> [{{ .Sender.Name | cyan }}] ",
 			Inactive: "   [{{ .Sender.Name | cyan }}] ",
 			Details: `
---------- Details ----------
-{{ "Sender:" | faint }}	{{ .Sender.Name }}: {{ .content }}`,
-		}
-
-		// searcher := func(input string, index int) bool {
-		// 	notif := returnedNotifs[index]
-		// 	name := strings.Replace(strings.ToLower(notif.Comment.Content), " ", "", -1)
-		// 	input = strings.Replace(strings.ToLower(input), " ", "", -1)
-
-		// 	return strings.Contains(name, input)
-		// }
-
-		searcher := func(input string, index int) bool {
-			notif := returnedNotifs[index]
-			name := strings.Replace(strings.ToLower(notif.content), " ", "", -1)
-			input = strings.Replace(strings.ToLower(input), " ", "", -1)
-
-			return strings.Contains(name, input)
+--- [{{ .Sender.Name | faint }}] ---
+{{ .Content }}
+------------------------------------`,
 		}
 
 		prompt := promptui.Select{
 			Label:     "Select notification",
-			Items:     returnedNotifs,
+			Items:     transformedNotifs,
 			Templates: templates,
 			Size:      6,
-			Searcher:  searcher,
 		}
 
 		i, _, err := prompt.Run()
@@ -107,9 +81,40 @@ var notifCmd = &cobra.Command{
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}
-		fmt.Printf("You choose number %d: %s\n", i+1, returnedNotifs[i].Sender.Name)
-
+		// fmt.Printf("You choose number %d: %s\n", i+1, returnedNotifs[i].Sender.Name)
+		notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d", GlobalConfig.BaseURL, returnedNotifs[i].ID)
+		openBrowser(notificationURL)
 	},
+}
+
+func (n *Notification) truncateName() {
+	var text string
+	maxCharacterCount := 60
+	switch n.Reason {
+	case 1:
+		text = n.Sender.Name + " changed the issue's assignee to you."
+		break
+	case 2:
+		text = n.Comment.Content
+		break
+	case 3:
+		text = n.Sender.Name + " added an issue."
+		break
+	case 11:
+		text = n.PullRequestComment.Content
+		break
+	case 13:
+		text = n.PullRequestComment.Content
+		break
+	default:
+		text = "Issue type unknown"
+		break
+	}
+	if len(text) > maxCharacterCount {
+		n.Content = text[:maxCharacterCount]
+	} else {
+		n.Content = text
+	}
 }
 
 func init() {
