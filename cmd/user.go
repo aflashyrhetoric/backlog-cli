@@ -21,6 +21,13 @@ type User struct {
 // CurrentUser ..
 type CurrentUser User
 
+var cookieCmd = &cobra.Command{
+	Use:   "cookie",
+	Short: "Returns data about myself",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("l0l")
+	},
+}
 var userCmd = &cobra.Command{
 	Use:   "user",
 	Short: "Returns data about myself",
@@ -56,5 +63,6 @@ func GetCurrentUser() User {
 }
 
 func init() {
+	userCmd.AddCommand(cookieCmd)
 	RootCmd.AddCommand(userCmd)
 }

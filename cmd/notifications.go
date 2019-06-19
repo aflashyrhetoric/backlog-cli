@@ -32,8 +32,9 @@ type notificationPullRequestComment struct {
 }
 
 var notifCmd = &cobra.Command{
-	Use:   "n",
-	Short: "Read and open your notifications",
+	Use:     "notification",
+	Aliases: []string{"n"},
+	Short:   "Read and open your notifications",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------

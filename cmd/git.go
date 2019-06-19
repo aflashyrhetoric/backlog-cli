@@ -7,10 +7,13 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 )
 
+var openFlag bool
+
 // FIXME: 'commit' should be a child of `git`, or in its own file, etc
 var gitCmd = &cobra.Command{
-	Use:   "latest",
-	Short: "Get a link to the latest commit",
+	Use:     "latest",
+	Aliases: []string{"lc"},
+	Short:   "Get a link to the latest commit",
 
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -32,9 +35,13 @@ var gitCmd = &cobra.Command{
 
 		// Fetch
 		fmt.Printf("Your latest commit: %s", commitURL)
+		if openFlag {
+			openBrowser(commitURL)
+		}
 	},
 }
 
 func init() {
+	gitCmd.Flags().BoolVarP(&openFlag, "open", "o", false, "Include to open in a browser window")
 	RootCmd.AddCommand(gitCmd)
 }
