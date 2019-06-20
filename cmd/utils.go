@@ -1,9 +1,15 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"os"
 	"os/exec"
 	"runtime"
+	"strings"
+
+	git "gopkg.in/src-d/go-git.v4"
 )
 
 // PrintResponse .. Prints out a []byte
@@ -54,4 +60,25 @@ func openBrowser(url string) bool {
 	}
 	cmd := exec.Command(args[0], append(args[1:], url)...)
 	return cmd.Start() == nil
+}
+
+func CheckIfBacklogRepo() {
+	var path string
+	path, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	repo, err := git.PlainOpen(path)
+	ErrorCheck(err)
+
+	// branchName, err := repo.Head()
+	branchName, err := repo.Remote("origin")
+	ErrorCheck(err)
+
+	if !strings.Contains(branchName.String(), "git.backlog") {
+		err = errors.New("this doesn't seem to be a Backlog repository - exiting")
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
 }

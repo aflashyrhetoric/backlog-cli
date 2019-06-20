@@ -36,6 +36,7 @@ func Execute() {
 }
 
 func init() {
+	CheckIfBacklogRepo()
 	cobra.OnInitialize(initConfig)
 }
 
@@ -118,6 +119,7 @@ func GetCurrentBranch() string {
 	ErrorCheck(err)
 
 	branchName, err := repo.Head()
+	ErrorCheck(err)
 
 	CurrentBranchName := branchName.Name()[11:]
 	ErrorCheck(err)

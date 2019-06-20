@@ -33,10 +33,16 @@ type pullRequestStatus struct {
 	Name string `json:"name"`
 }
 
+// The branch that we wish to merge to
 var BaseBranch string
 
 var prCmd = &cobra.Command{
 	Use:   "pr",
+	Short: "Create pull requests or open them (if there is only one associated pull request)",
+}
+
+var prCreateCmd = &cobra.Command{
+	Use:   "create",
 	Short: "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -151,6 +157,7 @@ func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
 }
 
 func init() {
-	prCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
+	prCreateCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
+	prCmd.AddCommand(prCreateCmd)
 	RootCmd.AddCommand(prCmd)
 }

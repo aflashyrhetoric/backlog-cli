@@ -1,6 +1,8 @@
 package cmd
 
-import git "gopkg.in/src-d/go-git.v4"
+import (
+	git "gopkg.in/src-d/go-git.v4"
+)
 
 // GlobalConfig .. the global configuration for backlog-cli
 var GlobalConfig Config
