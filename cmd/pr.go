@@ -42,8 +42,9 @@ var prCmd = &cobra.Command{
 }
 
 var prCreateCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
+	Use:     "create",
+	Aliases: []string{"c"},
+	Short:   "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------
@@ -59,12 +60,11 @@ var prCreateCmd = &cobra.Command{
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
 		if len(existingPRs) > 0 {
-			listPRs(existingPRs)
+			listPRs("hand", "Existing Pull Requests found", existingPRs)
 			reader := bufio.NewReader(os.Stdin)
 			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n) ")
 			text, _ := reader.ReadString('\n')
 			text = strings.TrimSpace(text)
-
 			if text != "y" {
 				return
 			}
@@ -106,10 +106,62 @@ var prCreateCmd = &cobra.Command{
 		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
+var prOpenCmd = &cobra.Command{
+	Use:     "open",
+	Aliases: []string{"o"},
+	Short:   "If there's a single PR, open it in a browser.",
+	Run: func(cmd *cobra.Command, args []string) {
 
-func listPRs(PRList []PullRequest) {
-	e.Print("\n\n:hand:")
-	fmt.Println(a.White("[Existing Pull Requests found]").BgBrightBlack())
+		// ---------------------------------------------------------
+
+		p := GlobalConfig.ProjectKey
+		r := GlobalConfig.RepositoryName
+		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
+
+		//apiURL = "test"
+		endpoint := Endpoint(apiURL)
+
+		existingPRs, err := checkForExistingPullRequests(endpoint)
+		ErrorCheck(err)
+
+		if len(existingPRs) == 1 {
+			fmt.Println("Opening associated PR")
+			openBrowser(getPRLink(existingPRs[0].Number))
+		}
+	},
+}
+
+var prListCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Short:   "List links to all associated pull requests",
+	Run: func(cmd *cobra.Command, args []string) {
+
+		// ---------------------------------------------------------
+
+		p := GlobalConfig.ProjectKey
+		r := GlobalConfig.RepositoryName
+		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
+
+		//apiURL = "test"
+		endpoint := Endpoint(apiURL)
+
+		existingPRs, err := checkForExistingPullRequests(endpoint)
+		ErrorCheck(err)
+
+		if len(existingPRs) == 0 {
+			fmt.Println("There are no pull requests associated to this issue.")
+		}
+		if len(existingPRs) > 0 {
+			listPRs("sparkles", fmt.Sprintf("Pull Requests for %s", GlobalConfig.CurrentIssue.IssueKey), existingPRs)
+		}
+
+	},
+}
+
+func listPRs(emoji string, message string, PRList []PullRequest) {
+	e.Print("\n\n:" + emoji + ":")
+	fmt.Println(a.White("[" + message + "]").BgBrightBlack())
 	count := 1
 	for _, pr := range PRList {
 
@@ -159,5 +211,7 @@ func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
 func init() {
 	prCreateCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
 	prCmd.AddCommand(prCreateCmd)
+	prCmd.AddCommand(prOpenCmd)
+	prCmd.AddCommand(prListCmd)
 	RootCmd.AddCommand(prCmd)
 }
