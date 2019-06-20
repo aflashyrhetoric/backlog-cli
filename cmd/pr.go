@@ -44,6 +44,7 @@ var prCmd = &cobra.Command{
 var prCreateCmd = &cobra.Command{
 	Use:     "create",
 	Aliases: []string{"c"},
+	Example: "pr create | pr create -b develop",
 	Short:   "Creates a Backlog Pull Request for the current branch to (master) or some other branch",
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -172,7 +173,6 @@ func listPRs(emoji string, message string, PRList []PullRequest) {
 			count++
 		}
 	}
-
 }
 
 func getPRLink(n int) string {

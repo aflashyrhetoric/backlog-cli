@@ -3,12 +3,20 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
+	e "github.com/kyokomi/emoji"
+	a "github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/spf13/cobra"
 )
+
+// Whether or not the user wants to open the
+var interactiveFlag bool
+var tableViewFlag bool
 
 // Notification .. a PARTIAL struct for a Notification
 type Notification struct {
@@ -24,6 +32,11 @@ type Notification struct {
 type notificationSender struct {
 	Name string `json:"name"`
 }
+
+func (n *notificationSender) string() string {
+	return n.Name
+}
+
 type notificationComment struct {
 	Content string `json:"content"`
 }
@@ -33,14 +46,13 @@ type notificationPullRequestComment struct {
 
 var notifCmd = &cobra.Command{
 	Use:     "notification",
-	Aliases: []string{"n"},
+	Aliases: []string{"notifications", "n"},
 	Short:   "Read and open your notifications",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------
 
 		apiURL := "/api/v2/notifications"
-
 		endpoint := Endpoint(apiURL)
 
 		params := map[string]int{
@@ -52,39 +64,47 @@ var notifCmd = &cobra.Command{
 		var returnedNotifs []Notification
 		json.Unmarshal(responseData, &returnedNotifs)
 
-		var transformedNotifs []Notification
+		var truncatedNotifications []Notification
 
 		for _, n := range returnedNotifs {
 			n.truncateName()
-			transformedNotifs = append(transformedNotifs, n)
+			truncatedNotifications = append(truncatedNotifications, n)
 		}
 
-		templates := &promptui.SelectTemplates{
-			Label:    "{{ .Sender.Name }}",
-			Active:   "-> [{{ .Sender.Name | cyan }}] ",
-			Inactive: "   [{{ .Sender.Name | cyan }}] ",
-			Details: `
+		if !interactiveFlag {
+			if tableViewFlag {
+				printNotificationTable(truncatedNotifications)
+			} else {
+				listNotifications("bell", "Notifications", truncatedNotifications)
+			}
+		} else {
+
+			templates := &promptui.SelectTemplates{
+				Label:    "{{ .Sender.Name }}",
+				Active:   "-> [{{ .Sender.Name | cyan }}] ",
+				Inactive: "   [{{ .Sender.Name | cyan }}] ",
+				Details: `
 --- [{{ .Sender.Name | faint }}] ---
 {{ .Content }}
 ------------------------------------`,
-		}
+			}
 
-		prompt := promptui.Select{
-			Label:     "Select notification",
-			Items:     transformedNotifs,
-			Templates: templates,
-			Size:      6,
-		}
+			prompt := promptui.Select{
+				Label:     "Select notification",
+				Items:     truncatedNotifications,
+				Templates: templates,
+				Size:      6,
+			}
 
-		i, _, err := prompt.Run()
+			i, _, err := prompt.Run()
 
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+			notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d\n", GlobalConfig.BaseURL, returnedNotifs[i].ID)
+			openBrowser(notificationURL)
 		}
-		// fmt.Printf("You choose number %d: %s\n", i+1, returnedNotifs[i].Sender.Name)
-		notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d", GlobalConfig.BaseURL, returnedNotifs[i].ID)
-		openBrowser(notificationURL)
 	},
 }
 
@@ -101,7 +121,22 @@ func (n *Notification) truncateName() {
 	case 3:
 		text = n.Sender.Name + " added an issue."
 		break
+	case 4:
+		text = n.Sender.Name + " updated an issue."
+		break
+	case 5:
+		text = n.Sender.Name + " attached a file."
+		break
+	case 9:
+		text = "Issue type unknown"
+		break
+	case 10:
+		text = n.PullRequestComment.Content
+		break
 	case 11:
+		text = n.PullRequestComment.Content
+		break
+	case 12:
 		text = n.PullRequestComment.Content
 		break
 	case 13:
@@ -118,7 +153,36 @@ func (n *Notification) truncateName() {
 	}
 }
 
+func listNotifications(emoji string, message string, notifList []Notification) {
+	e.Print("\n\n:" + emoji + ":")
+	fmt.Println(a.White("[" + message + "]").BgBrightBlack())
+	for i, notif := range notifList {
+		fmt.Printf("[%d] %s: %s\n", i, notif.Sender, notif.Content)
+	}
+}
+
+func printNotificationTable(notifList []Notification) {
+	var data [][]string
+
+	for _, notif := range notifList {
+		data = append(data, []string{
+			notif.Sender.string(),
+			notif.Content,
+		})
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Sender", "Content"})
+
+	for _, v := range data {
+		table.Append(v)
+	}
+	// Send output
+	table.Render()
+}
+
 func init() {
-	// notifCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
+	notifCmd.Flags().BoolVarP(&interactiveFlag, "interactive", "i", false, "Include to open interactive notification viewer")
+	notifCmd.Flags().BoolVarP(&tableViewFlag, "table", "t", false, "Include to view notifications as a table")
 	RootCmd.AddCommand(notifCmd)
 }

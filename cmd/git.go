@@ -17,9 +17,11 @@ var gitCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// ---------------------------------------------------------
+
 		// Open repository and fetch logs
-		r := Repository()
-		logs, err := r.Log(&git.LogOptions{})
+		repo := GlobalConfig.Repository
+		logs, err := repo.Log(&git.LogOptions{})
 		ErrorPanic(err)
 
 		// Fetch latest commit

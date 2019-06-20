@@ -19,7 +19,7 @@ type Issue struct {
 
 var issueCmd = &cobra.Command{
 	Use:     "issue",
-	Aliases: []string{"i"},
+	Aliases: []string{"issues", "i"},
 	Short:   "Create issues",
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -50,7 +50,7 @@ var issueCmd = &cobra.Command{
 
 func init() {
 	// notifCmd.Flags().StringVarP(&BaseBranch, "branch", "b", "master", "Designate a branch (other than master) to merge to.")
-	RootCmd.AddCommand(issueCmd)
+	// RootCmd.AddCommand(issueCmd)
 }
 
 // Key .. Returns the issue's key (e.g. "BLG-123") as a string

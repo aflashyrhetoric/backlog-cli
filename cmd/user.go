@@ -21,21 +21,12 @@ type User struct {
 // CurrentUser ..
 type CurrentUser User
 
-var cookieCmd = &cobra.Command{
-	Use:   "cookie",
-	Short: "Returns data about myself",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("l0l")
-	},
-}
 var userCmd = &cobra.Command{
-	Use:   "user",
-	Short: "Returns data about myself",
+	Hidden: true,
+	Use:    "user",
+	Short:  "Returns data about myself",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// ---------------------------------------------------------
-
-		// Set up Endpoint
 		apiURL := "/api/v2/users/myself"
 		endpoint := Endpoint(apiURL)
 
@@ -52,10 +43,8 @@ func GetCurrentUser() User {
 	apiURL := "/api/v2/users/myself"
 	endpoint := Endpoint(apiURL)
 
-	// Fetch
 	responseData := utils.Get(endpoint)
 
-	// A Response struct to map the Entire Response
 	var returnedUser User
 	json.Unmarshal(responseData, &returnedUser)
 
@@ -63,6 +52,5 @@ func GetCurrentUser() User {
 }
 
 func init() {
-	userCmd.AddCommand(cookieCmd)
 	RootCmd.AddCommand(userCmd)
 }
