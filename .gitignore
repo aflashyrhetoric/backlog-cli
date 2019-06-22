@@ -5,6 +5,7 @@ backlog-cli
 backlog-config.yaml
 config.yaml
 node_modules/
+ignore/
 .idea/*
 *.swp
 *.swo
