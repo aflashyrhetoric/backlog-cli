@@ -52,14 +52,13 @@ var notifCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		apiURL := "/api/v2/notifications"
-		endpoint := Endpoint(apiURL)
+		endpoint := NotificationEndpoint()
 
-		params := map[string]int{
+		params := utils.GetParam{
 			"count": 15,
 		}
 		// Add issueID if it exists
-		responseData := utils.GetParams(endpoint, params)
+		responseData := utils.GetWithParams(endpoint, params)
 
 		var returnedNotifs []Notification
 		json.Unmarshal(responseData, &returnedNotifs)

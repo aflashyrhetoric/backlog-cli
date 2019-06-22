@@ -52,14 +52,13 @@ var prCreateCmd = &cobra.Command{
 
 		cb := GlobalConfig.CurrentBranch
 
-		sb := NewStringBuilder()
-		endpoint := sb.PREndpoint()
+		endpoint := PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
 		// If there are PRs, warn the user
 		if len(existingPRs) > 0 {
-			listPRs("hand", "Existing Pull Requests found", existingPRs)
+			PrintPRList("hand", "Existing Pull Requests found", existingPRs)
 			reader := bufio.NewReader(os.Stdin)
 			fmt.Printf("\n\nPull Requests for this issue already exist - would you still like to create one? (y\\n) ")
 			text, _ := reader.ReadString('\n')
@@ -101,7 +100,7 @@ var prCreateCmd = &cobra.Command{
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
 
-		linkToPR := getPRLink(returnedPullRequest.Number)
+		linkToPR := LinkToPRPage(returnedPullRequest.Number)
 		fmt.Printf("Link to PR: %s", linkToPR)
 	},
 }
@@ -113,15 +112,14 @@ var prOpenCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		sb := NewStringBuilder()
-		endpoint := sb.PREndpoint()
+		endpoint := PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 		ErrorCheck(err)
 
 		if len(existingPRs) == 1 {
 			fmt.Println("Opening associated PR")
-			openBrowser(getPRLink(existingPRs[0].Number))
+			openBrowser(LinkToPRPage(existingPRs[0].Number))
 		}
 	},
 }
@@ -134,8 +132,7 @@ var prListCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		sb := NewStringBuilder()
-		endpoint := sb.PREndpoint()
+		endpoint := PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 		ErrorCheck(err)
@@ -144,52 +141,44 @@ var prListCmd = &cobra.Command{
 			fmt.Println("There are no pull requests associated to this issue.")
 		}
 		if len(existingPRs) > 0 {
-			listPRs("sparkles", fmt.Sprintf("Pull Requests for %s", GlobalConfig.CurrentIssue.IssueKey), existingPRs)
+			PrintPRList("sparkles", fmt.Sprintf("Pull Requests for %s", GlobalConfig.CurrentIssue.IssueKey), existingPRs)
 		}
-
 	},
 }
 
-func listPRs(emoji string, message string, PRList []PullRequest) {
-	e.Print("\n\n:" + emoji + ":")
-	fmt.Println(a.White("[" + message + "]").BgBrightBlack())
-	count := 1
-	for _, pr := range PRList {
+// PrintPRList ... Prints a list of pull requests
+func PrintPRList(emoji string, message string, PRList []PullRequest) {
+	EmojiPrefixMessage(emoji)
 
+	fmt.Println(a.White("[" + message + "]").BgBrightBlack())
+
+	for i, pr := range PRList {
 		// If there are open PRs with a matching issue ID
 		if pr.Status.ID == 1 && pr.Issue.ID == GlobalConfig.CurrentIssue.ID {
-			fmt.Printf("%v: %s\n", count, getPRLink(pr.Number))
+			fmt.Printf("%v: %s\n", i+1, LinkToPRPage(pr.Number))
 			fmt.Printf("   %s %s %s\n", a.Cyan(pr.Branch), a.Bold("-->"), a.Cyan(pr.Base))
-			count++
 		}
 	}
-}
-
-func getPRLink(n int) string {
-	return fmt.Sprintf("%s/git/%s/%s/pullRequests/%d", GlobalConfig.BaseURL, GlobalConfig.ProjectKey, GlobalConfig.RepositoryName, n)
 }
 
 func checkForExistingPullRequests(endpoint string) ([]PullRequest, error) {
 
 	// params for pull requests
-	params := map[string]int{
+	params := utils.GetParam{
 		"statusId[]": 1,
 	}
 
-	responseData := utils.GetParams(endpoint, params)
-
-	// List of Pull Requests that already exist and share the ID
-	var existingPullRequests []PullRequest
+	responseData := utils.GetWithParams(endpoint, params)
 
 	// List of returned pull requests
 	var returnedPullRequests []PullRequest
 	err := json.Unmarshal(responseData, &returnedPullRequests)
-
 	ErrorCheck(err)
 
+	// List of Pull Requests that already exist for current issue
+	var existingPullRequests []PullRequest
+
 	for _, element := range returnedPullRequests {
-		// fmt.Println(GlobalConfig.CurrentIssue)
-		// fmt.Println(element)
 		if element.Issue.ID == GlobalConfig.CurrentIssue.ID {
 			existingPullRequests = append(existingPullRequests, element)
 		}

@@ -27,8 +27,7 @@ var userCmd = &cobra.Command{
 	Short:  "Returns data about myself",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		sb := NewStringBuilder()
-		endpoint := sb.UserEndpoint()
+		endpoint := UserEndpoint()
 
 		// Unmarshal response data to variable
 		var currentUser User
@@ -42,8 +41,7 @@ var userCmd = &cobra.Command{
 // GetCurrentUser .. Returns the current user
 func GetCurrentUser() User {
 
-	sb := NewStringBuilder()
-	endpoint := sb.UserEndpoint()
+	endpoint := UserEndpoint()
 
 	responseData := utils.Get(endpoint)
 

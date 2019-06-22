@@ -50,11 +50,14 @@ func initConfig() {
 		debugPrint("Using config file: %s\n", configFile)
 
 		GlobalConfig = Config{
-			BaseURL:       viper.GetString("BASEURL"),
-			APIKey:        viper.GetString("API_KEY"),
-			Repository:    GetCurrentRepo(),
-			CurrentBranch: GetCurrentBranch(),
+			BaseURL:           viper.GetString("BASEURL"),
+			APIKey:            viper.GetString("API_KEY"),
+			Repository:        GetCurrentRepo(),
+			CurrentBranch:     GetCurrentBranch(),
+			BacklogAPIVersion: 2,
 		}
+
+		// SB := NewStringBuilder()
 
 		// Configuration that requires HTTP, call them after GlobalConfig is initialized
 		GlobalConfig.RepositoryName = GetCurrentRepositoryName()

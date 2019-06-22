@@ -9,15 +9,16 @@ var GlobalConfig Config
 
 // Config .. the configuration struct for backlog-cli
 type Config struct {
-	User           User
-	BaseURL        string
-	APIKey         string
-	ProjectKey     string
-	Repository     *git.Repository
-	RepositoryName string
-	CurrentBranch  string
-	CurrentIssue   Issue
-	DebugMode      bool
+	User              User
+	BaseURL           string
+	APIKey            string
+	ProjectKey        string
+	Repository        *git.Repository
+	RepositoryName    string
+	CurrentBranch     string
+	CurrentIssue      Issue
+	DebugMode         bool
+	BacklogAPIVersion int
 }
 
 // Helper to set the User to the GlobalConfig

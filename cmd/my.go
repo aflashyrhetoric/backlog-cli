@@ -24,13 +24,8 @@ var myPullRequestCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		p := GlobalConfig.ProjectKey
-		r := GlobalConfig.RepositoryName
-		// ! FIXME THIS ISNT THE RIGHT apiURL
-		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
-
 		//apiURL = "test"
-		endpoint := Endpoint(apiURL)
+		endpoint := PREndpoint()
 
 		myPullRequests, err := getMyPullRequests(endpoint)
 		ErrorCheck(err)
@@ -74,11 +69,11 @@ var myPullRequestCmd = &cobra.Command{
 func getMyPullRequests(endpoint string) ([]PullRequest, error) {
 
 	// params for pull requests
-	params := map[string]int{
+	params := utils.GetParam{
 		"assigneeId[]": GlobalConfig.User.ID,
 	}
 
-	responseData := utils.GetParams(endpoint, params)
+	responseData := utils.GetWithParams(endpoint, params)
 
 	// List of Pull Requests that already exist and share the ID
 	var existingPullRequests []PullRequest

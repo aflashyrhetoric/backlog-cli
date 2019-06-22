@@ -25,6 +25,9 @@ type ErrorsList struct {
 	errorList []Error
 }
 
+// GetParam ... is an array of string parameters
+type GetParam map[string]int
+
 // Get .. issues an HTTP GET request
 func Get(endpoint string) []byte {
 	response, err := http.Get(endpoint)
@@ -41,8 +44,8 @@ func Get(endpoint string) []byte {
 	return responseData
 }
 
-// GetParams .. issues an HTTP Get request with query parameters
-func GetParams(endpoint string, queryParams map[string]int) []byte {
+// GetWithParams .. issues an HTTP Get request with query parameters
+func GetWithParams(endpoint string, queryParams map[string]int) []byte {
 	queryString := ""
 
 	for k, v := range queryParams {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/url"
 	"regexp"
-	"strconv"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
 	"github.com/spf13/cobra"
@@ -26,8 +25,7 @@ var issueCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		apiURL := "/api/v2/issues"
-		endpoint := Endpoint(apiURL)
+		endpoint := IssueListEndpoint()
 
 		// 		templates := &promptui.SelectTemplates{
 		// 			Label:    "{{ .Sender.Name }}",
@@ -55,8 +53,7 @@ func init() {
 
 // Key .. Returns the issue's key (e.g. "BLG-123") as a string
 func (i *Issue) Key() string {
-	apiURL := "/api/v2/issues/" + strconv.Itoa(i.ID)
-	endpoint := Endpoint(apiURL)
+	endpoint := IssueListEndpoint()
 	responseData := utils.Get(endpoint)
 
 	// A Response struct to map the Entire Response
@@ -77,16 +74,13 @@ func GetCurrentIssue() Issue {
 	if reg.Find([]byte(cb)) != nil {
 		issueID = string(reg.Find([]byte(cb)))
 	}
-	apiURL := "/api/v2/issues/" + string(issueID)
 
-	// Get Issue Data
-	endpoint := Endpoint(apiURL)
-
+	endpoint := IssueEndpoint(issueID)
 	responseData := utils.Get(endpoint)
 
 	var currentIssue Issue
 	json.Unmarshal(responseData, &currentIssue)
-	// Convert integer -> string for use in later functions
+
 	return currentIssue
 }
 
@@ -94,7 +88,6 @@ func GetCurrentIssue() Issue {
 func GetProjectKey() string {
 	repo := GetCurrentRepo()
 
-	// Open the 'origin' remote
 	originRemote, err := repo.Remote("origin")
 	ErrorCheck(err)
 
