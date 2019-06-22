@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"runtime"
 
+	e "github.com/kyokomi/emoji"
 	"github.com/spf13/viper"
 )
 
@@ -14,11 +15,11 @@ func PrintResponse(responseData []byte) {
 }
 
 // Endpoint .. returns an endpoint
-func Endpoint(apiURL string) string {
-	// FIXME: We should just take SpaceID and build the "baseURL" from that
-	endpoint := fmt.Sprintf("%s%s?apiKey=%s", GlobalConfig.BaseURL, apiURL, GlobalConfig.APIKey)
-	return endpoint
-}
+// func Endpoint(apiURL string) string {
+// 	// FIXME: We should just take SpaceID and build the "baseURL" from that
+// 	endpoint := fmt.Sprintf("%s%s?apiKey=%s", GlobalConfig.BaseURL, apiURL, GlobalConfig.APIKey)
+// 	return endpoint
+// }
 
 // ErrorCheck .. Checks for error != nil
 func ErrorCheck(err error) {
@@ -62,4 +63,9 @@ func debugPrint(format string, a ...interface{}) {
 	if viper.GetString("DEBUG_MODE") == "true" {
 		fmt.Printf(format, a...)
 	}
+}
+
+// EmojiPrefixMessage ... LogGlobalConfig...an emoji....
+func EmojiPrefixMessage(emoji string) {
+	e.Print("\n\n:" + emoji + ":")
 }
