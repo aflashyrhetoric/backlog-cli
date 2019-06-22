@@ -73,39 +73,43 @@ var notifCmd = &cobra.Command{
 
 		if !interactiveFlag {
 			if tableViewFlag {
-				printNotificationTable(truncatedNotifications)
-			} else {
 				listNotifications("bell", "Notifications", truncatedNotifications)
+			} else {
+				printNotificationTable(truncatedNotifications)
 			}
 		} else {
+			notificationInteractive(returnedNotifs, truncatedNotifications)
+		}
+	},
+}
 
-			templates := &promptui.SelectTemplates{
-				Label:    "{{ .Sender.Name }}",
-				Active:   "-> [{{ .Sender.Name | cyan }}] ",
-				Inactive: "   [{{ .Sender.Name | cyan }}] ",
-				Details: `
+func notificationInteractive(returnedNotifs, truncatedNotifications []Notification) {
+
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ .Sender.Name }}",
+		Active:   "-> [{{ .Sender.Name | cyan }}] ",
+		Inactive: "   [{{ .Sender.Name | cyan }}] ",
+		Details: `
 --- [{{ .Sender.Name | faint }}] ---
 {{ .Content }}
 ------------------------------------`,
-			}
+	}
 
-			prompt := promptui.Select{
-				Label:     "Select notification",
-				Items:     truncatedNotifications,
-				Templates: templates,
-				Size:      6,
-			}
+	prompt := promptui.Select{
+		Label:     "Select notification",
+		Items:     truncatedNotifications,
+		Templates: templates,
+		Size:      6,
+	}
 
-			i, _, err := prompt.Run()
+	i, _, err := prompt.Run()
 
-			if err != nil {
-				fmt.Printf("Prompt failed %v\n", err)
-				return
-			}
-			notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d", GlobalConfig.BaseURL, returnedNotifs[i].ID)
-			openBrowser(notificationURL)
-		}
-	},
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+	notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d", GlobalConfig.BaseURL, returnedNotifs[i].ID)
+	openBrowser(notificationURL)
 }
 
 func (n *Notification) truncateName() {
@@ -128,7 +132,7 @@ func (n *Notification) truncateName() {
 		text = n.Sender.Name + " attached a file."
 		break
 	case 9:
-		text = "Issue type unknown"
+		text = "Check Backlog for details."
 		break
 	case 10:
 		text = n.PullRequestComment.Content
@@ -183,6 +187,6 @@ func printNotificationTable(notifList []Notification) {
 
 func init() {
 	notifCmd.Flags().BoolVarP(&interactiveFlag, "interactive", "i", false, "Include to open interactive notification viewer")
-	notifCmd.Flags().BoolVarP(&tableViewFlag, "table", "t", false, "Include to view notifications as a table")
+	notifCmd.Flags().BoolVarP(&tableViewFlag, "text", "t", false, "Include to view notifications as a simple list output")
 	RootCmd.AddCommand(notifCmd)
 }
