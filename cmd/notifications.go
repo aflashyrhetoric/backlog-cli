@@ -102,7 +102,7 @@ var notifCmd = &cobra.Command{
 				fmt.Printf("Prompt failed %v\n", err)
 				return
 			}
-			notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d\n", GlobalConfig.BaseURL, returnedNotifs[i].ID)
+			notificationURL := fmt.Sprintf("%s/globalbar/notifications/redirect/%d", GlobalConfig.BaseURL, returnedNotifs[i].ID)
 			openBrowser(notificationURL)
 		}
 	},
