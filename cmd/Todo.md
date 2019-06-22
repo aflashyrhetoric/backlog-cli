@@ -1,8 +1,8 @@
 # To Do
 
 ## Priorities
-- [ ] Interactive `blg init` to initialize configuration
 - [ ] Create LinkBuilders for PR/Notification
+- [ ] Interactive `blg init` to initialize configuration
 
 ## Main List 
 - [ ] Clean up emoji handling in strings 
