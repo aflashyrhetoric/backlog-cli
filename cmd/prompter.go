@@ -22,7 +22,7 @@ func PromptInput(message string) (string, error) {
 	}
 
 	prompt := promptui.Prompt{
-		Label:    "Assignee",
+		Label:    "Assignee ",
 		Validate: validate,
 		Default:  "me",
 	}

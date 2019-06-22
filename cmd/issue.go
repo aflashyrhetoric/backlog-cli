@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
@@ -60,12 +61,16 @@ var createIssueCmd = &cobra.Command{
 		// issueTypeId= 2
 		// priorityId= 3
 		fmt.Println("BLG: Creating new issue.")
+		// Create issue Form
+		form := url.Values{}
+
 		assignee, err := PromptInput("Type the name of an assignee.")
 		assignee = strings.ToLower(assignee)
 		ErrorCheck(err)
 
 		if assignee == "me" {
-			assignee = string(GlobalConfig.User.ID)
+			assignee = strconv.Itoa(GlobalConfig.User.ID)
+			fmt.Println(assignee)
 		} else {
 			matchedUsers := searchUsers(assignee, GetUserList())
 			// If match not found
@@ -79,17 +84,16 @@ var createIssueCmd = &cobra.Command{
 
 			if len(matchedUsers) > 1 {
 				matchedUser := AssigneeSelect(matchedUsers)
-				assignee = string(matchedUser.ID)
+				assignee = strconv.Itoa(matchedUser.ID)
 			}
 		}
-
-		// Create issue Form
-		form := url.Values{}
 
 		// Addknown values + defaults
 		form.Add("assigneeId", assignee)
 		form.Add("issueTypeId", "2")
 		form.Add("priorityId", "3")
+		form.Add("projectId", "1073846676")
+		form.Add("projectKey", "EXPERIMENT")
 
 		summary, err := AskFormField("Summary")
 		ErrorCheck(err)
@@ -98,10 +102,8 @@ var createIssueCmd = &cobra.Command{
 		description, err := AskFormField("Description")
 		ErrorCheck(err)
 		form.Add("description", description)
-		fmt.Println(description)
 
 		endpoint := IssueListEndpoint()
-		fmt.Println(form)
 		responseData, err := utils.Post(endpoint, form)
 		ErrorPanic(err)
 

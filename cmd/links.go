@@ -10,5 +10,5 @@ func LinkToPRPage(n int) string {
 }
 
 func LinkToIssuePage(issueKey string) string {
-	return fmt.Sprintf("%s/view/%s", issueKey)
+	return fmt.Sprintf("%s/view/%s", GlobalConfig.BaseURL, issueKey)
 }

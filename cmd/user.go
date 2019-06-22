@@ -41,7 +41,7 @@ var userCmd = &cobra.Command{
 // GetCurrentUser .. Returns the current user
 func GetCurrentUser() User {
 
-	endpoint := UserEndpoint()
+	endpoint := UserSelfEndpoint()
 	responseData := utils.Get(endpoint)
 
 	var returnedUser User
