@@ -41,7 +41,7 @@ func Get(endpoint string) []byte {
 	return responseData
 }
 
-// GetParams .. issues an HTTP Get request with parameters
+// GetParams .. issues an HTTP Get request with query parameters
 func GetParams(endpoint string, queryParams map[string]int) []byte {
 	queryString := ""
 

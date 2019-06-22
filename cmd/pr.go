@@ -51,15 +51,13 @@ var prCreateCmd = &cobra.Command{
 		// ---------------------------------------------------------
 
 		cb := GlobalConfig.CurrentBranch
-		p := GlobalConfig.ProjectKey
-		r := GlobalConfig.RepositoryName
-		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		//apiURL = "test"
-		endpoint := Endpoint(apiURL)
+		sb := NewStringBuilder()
+		endpoint := sb.PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
+		// If there are PRs, warn the user
 		if len(existingPRs) > 0 {
 			listPRs("hand", "Existing Pull Requests found", existingPRs)
 			reader := bufio.NewReader(os.Stdin)
@@ -84,7 +82,7 @@ var prCreateCmd = &cobra.Command{
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
 		form := url.Values{}
-		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary))
+		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary, 45))
 		form.Add("description", GlobalConfig.CurrentIssue.Description)
 		// Branch to merge to
 		form.Add("base", BaseBranch)
@@ -115,12 +113,8 @@ var prOpenCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		p := GlobalConfig.ProjectKey
-		r := GlobalConfig.RepositoryName
-		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
-
-		//apiURL = "test"
-		endpoint := Endpoint(apiURL)
+		sb := NewStringBuilder()
+		endpoint := sb.PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 		ErrorCheck(err)
@@ -140,12 +134,8 @@ var prListCmd = &cobra.Command{
 
 		// ---------------------------------------------------------
 
-		p := GlobalConfig.ProjectKey
-		r := GlobalConfig.RepositoryName
-		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
-
-		//apiURL = "test"
-		endpoint := Endpoint(apiURL)
+		sb := NewStringBuilder()
+		endpoint := sb.PREndpoint()
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 		ErrorCheck(err)

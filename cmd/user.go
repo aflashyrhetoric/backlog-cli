@@ -27,21 +27,23 @@ var userCmd = &cobra.Command{
 	Short:  "Returns data about myself",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		apiURL := "/api/v2/users/myself"
-		endpoint := Endpoint(apiURL)
+		sb := NewStringBuilder()
+		endpoint := sb.UserEndpoint()
 
 		// Unmarshal response data to variable
 		var currentUser User
 		responseData := utils.Get(endpoint)
 		json.Unmarshal(responseData, &currentUser)
+
 		fmt.Printf("User info for: %v", currentUser)
 	},
 }
 
 // GetCurrentUser .. Returns the current user
 func GetCurrentUser() User {
-	apiURL := "/api/v2/users/myself"
-	endpoint := Endpoint(apiURL)
+
+	sb := NewStringBuilder()
+	endpoint := sb.UserEndpoint()
 
 	responseData := utils.Get(endpoint)
 
@@ -51,6 +53,25 @@ func GetCurrentUser() User {
 	return returnedUser
 }
 
+func (u *User) printUserTable() {
+	fmt.Printf("Name: %s\n", u.Name)
+	fmt.Printf("Email: %s\n", u.Email)
+	fmt.Printf("Link to Profile: %s/user/%s\n", GlobalConfig.BaseURL, u.Username)
+	fmt.Printf("Link to Gantt Chart: %s/user/%s#usergantt\n", GlobalConfig.BaseURL, u.Username)
+	fmt.Printf("Link to Settings Page: %s/EditProfile.action\n", GlobalConfig.BaseURL)
+}
+
+var meCmd = &cobra.Command{
+	Use:   "me",
+	Short: "Get quick links for the current user",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		u := GlobalConfig.User
+		u.printUserTable()
+	},
+}
+
 func init() {
+	RootCmd.AddCommand(meCmd)
 	RootCmd.AddCommand(userCmd)
 }

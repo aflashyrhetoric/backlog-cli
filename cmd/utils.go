@@ -1,15 +1,11 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"log"
-	"os"
 	"os/exec"
 	"runtime"
-	"strings"
 
-	git "gopkg.in/src-d/go-git.v4"
+	"github.com/spf13/viper"
 )
 
 // PrintResponse .. Prints out a []byte
@@ -39,9 +35,8 @@ func ErrorPanic(err error) {
 	}
 }
 
-// Truncate .. truncates a string to its max
-func Truncate(s string) string {
-	max := 45
+// truncate .. truncates a string
+func Truncate(s string, max int) string {
 	if len(s) >= max {
 		return s[0:max]
 	}
@@ -62,23 +57,9 @@ func openBrowser(url string) bool {
 	return cmd.Start() == nil
 }
 
-func CheckIfBacklogRepo() {
-	var path string
-	path, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	repo, err := git.PlainOpen(path)
-	ErrorCheck(err)
-
-	// branchName, err := repo.Head()
-	branchName, err := repo.Remote("origin")
-	ErrorCheck(err)
-
-	if !strings.Contains(branchName.String(), "git.backlog") {
-		err = errors.New("this doesn't seem to be a Backlog repository - exiting")
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+// Prints if debug mode is on
+func debugPrint(format string, a ...interface{}) {
+	if viper.GetString("DEBUG_MODE") == "true" {
+		fmt.Printf(format, a...)
 	}
 }

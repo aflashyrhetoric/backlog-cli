@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"net/url"
+	"regexp"
 	"strconv"
 
 	"github.com/aflashyrhetoric/backlog-cli/utils"
@@ -26,7 +27,6 @@ var issueCmd = &cobra.Command{
 		// ---------------------------------------------------------
 
 		apiURL := "/api/v2/issues"
-
 		endpoint := Endpoint(apiURL)
 
 		// 		templates := &promptui.SelectTemplates{
@@ -64,4 +64,47 @@ func (i *Issue) Key() string {
 	json.Unmarshal(responseData, &returnedIssue)
 
 	return returnedIssue.IssueKey
+}
+
+// GetCurrentIssue .. Returns the current issue
+func GetCurrentIssue() Issue {
+
+	var issueID string
+
+	// By default, get Issue ID from current branch name if possible
+	cb := GlobalConfig.CurrentBranch
+	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
+	if reg.Find([]byte(cb)) != nil {
+		issueID = string(reg.Find([]byte(cb)))
+	}
+	apiURL := "/api/v2/issues/" + string(issueID)
+
+	// Get Issue Data
+	endpoint := Endpoint(apiURL)
+
+	responseData := utils.Get(endpoint)
+
+	var currentIssue Issue
+	json.Unmarshal(responseData, &currentIssue)
+	// Convert integer -> string for use in later functions
+	return currentIssue
+}
+
+// GetProjectKey ... Returns the project key for the configuration (e.g "MARKETING")
+func GetProjectKey() string {
+	repo := GetCurrentRepo()
+
+	// Open the 'origin' remote
+	originRemote, err := repo.Remote("origin")
+	ErrorCheck(err)
+
+	// Fetch references from 'origin'
+	repoReferences := originRemote.String()
+
+	// Capture repository name from reference
+	reg := regexp.MustCompile(`\/([A-Z]*)\/(.*)\.git`)
+	repositoryCapturedString := reg.FindSubmatch([]byte(repoReferences))
+	projectKey := string(repositoryCapturedString[1])
+
+	return projectKey
 }
