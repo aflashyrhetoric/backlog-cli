@@ -36,7 +36,27 @@ func PromptInput(message string) (string, error) {
 	return result, nil
 }
 
-// AskFormField
+// PromptConfirm ... Prompts user for a y/n question
+func PromptConfirm(message string) (bool, error) {
+	fmt.Println(message)
+
+	prompt := promptui.Prompt{
+		Label:     "Assignee ",
+		IsConfirm: true,
+		Default:   "n",
+	}
+
+	result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return false, err
+	}
+
+	return result == "y", nil
+}
+
+// AskFormField ... Requests and returns a field for a url.Values form
 func AskFormField(label string) (string, error) {
 	validate := func(input string) error {
 		if len(input) < 4 && input != "me" {

@@ -13,6 +13,10 @@ A CLI tool to interact with [Backlog](backlogtool.com), a project management too
   - Ensure that `/usr/local/bin` is in your `$PATH`
   - To add elsewhere, simply do: `go build -o /your/preferred/path/blg *.go`
 
+## Command Overview Diagram
+
+https://cacoo.com/diagrams/PpBVFxxmhAuFhgOY/58ECA
+
 ## Usage
 
 ```bash

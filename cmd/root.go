@@ -66,7 +66,8 @@ func initConfig() {
 		GlobalConfig.User = GetCurrentUser()
 
 	} else {
-		fmt.Println("Config file not found. Please create a config at $HOME/backlog-config.yaml")
+		fmt.Println("Config file not found. Initializing setup...")
+		InitialSetup()
 	}
 
 	viper.AutomaticEnv()
