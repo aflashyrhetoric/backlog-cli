@@ -60,12 +60,10 @@ func initConfig() {
 			BacklogAPIVersion: 2,
 		}
 
-		// SB := NewStringBuilder()
-
 		// Configuration that requires HTTP, call them after GlobalConfig is initialized
 		GlobalConfig.RepositoryName = GetCurrentRepositoryName()
 		GlobalConfig.ProjectKey = GetProjectKey()
-		// GlobalConfig.CurrentIssue = GetCurrentIssue()
+		GlobalConfig.CurrentIssue = GetCurrentIssue()
 		GlobalConfig.User = GetCurrentUser()
 
 	} else {

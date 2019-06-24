@@ -78,7 +78,6 @@ func InitialSetup() {
 	ErrorPanic(err)
 
 	fmt.Println("Backlog CLI configuration complete.")
-
 }
 
 // Helper to set the User to the GlobalConfig

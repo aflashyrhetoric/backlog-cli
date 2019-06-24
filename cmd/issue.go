@@ -146,25 +146,25 @@ func (i *Issue) Key() string {
 }
 
 // GetCurrentIssue .. Returns the current issue
-// func GetCurrentIssue() Issue {
+func GetCurrentIssue() Issue {
 
-// 	var issueID string
+	var issueID string
 
-// 	// By default, get Issue ID from current branch name if possible
-// 	cb := GlobalConfig.CurrentBranch
-// 	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
-// 	if reg.Find([]byte(cb)) != nil {
-// 		issueID = string(reg.Find([]byte(cb)))
-// 	}
+	// By default, get Issue ID from current branch name if possible
+	cb := GlobalConfig.CurrentBranch
+	reg := regexp.MustCompile("([a-zA-Z]+-[0-9]*)")
+	if reg.Find([]byte(cb)) != nil {
+		issueID = string(reg.Find([]byte(cb)))
+	}
 
-// 	endpoint := IssueEndpoint(issueID)
-// 	responseData := utils.Get(endpoint)
+	endpoint := IssueEndpoint(issueID)
+	responseData := utils.Get(endpoint)
 
-// 	var currentIssue Issue
-// 	json.Unmarshal(responseData, &currentIssue)
+	var currentIssue Issue
+	json.Unmarshal(responseData, &currentIssue)
 
-// 	return currentIssue
-// }
+	return currentIssue
+}
 
 // GetProjectKey ... Returns the project key for the configuration (e.g "MARKETING")
 func GetProjectKey() string {
