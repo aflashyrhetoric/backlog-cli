@@ -49,10 +49,13 @@ func initConfig() {
 	if configFile != "" {
 		debugPrint("Using config file: %s\n", configFile)
 
+		currentRepository, err := GetCurrentRepo()
+		ErrorCheck(err)
+
 		GlobalConfig = Config{
 			BaseURL:           viper.GetString("BASEURL"),
 			APIKey:            viper.GetString("API_KEY"),
-			Repository:        GetCurrentRepo(),
+			Repository:        currentRepository,
 			CurrentBranch:     GetCurrentBranch(),
 			BacklogAPIVersion: 2,
 		}
@@ -62,12 +65,14 @@ func initConfig() {
 		// Configuration that requires HTTP, call them after GlobalConfig is initialized
 		GlobalConfig.RepositoryName = GetCurrentRepositoryName()
 		GlobalConfig.ProjectKey = GetProjectKey()
-		GlobalConfig.CurrentIssue = GetCurrentIssue()
+		// GlobalConfig.CurrentIssue = GetCurrentIssue()
 		GlobalConfig.User = GetCurrentUser()
 
 	} else {
-		fmt.Println("Config file not found. Initializing setup...")
+		// fmt.Println("Config file not found. Initializing setup...")
 		InitialSetup()
+		os.Exit(0)
+		return
 	}
 
 	viper.AutomaticEnv()

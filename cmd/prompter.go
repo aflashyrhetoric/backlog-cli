@@ -10,9 +10,7 @@ import (
 var boop bool
 
 // PromptInput ... Prompts user for an assignee and returns a best guess at an assigneeID
-func PromptInput(message string) (string, error) {
-
-	fmt.Println(message)
+func PromptInput(label, defaultValue string) (string, error) {
 
 	validate := func(input string) error {
 		if len(input) < 4 && input != "me" {
@@ -22,9 +20,35 @@ func PromptInput(message string) (string, error) {
 	}
 
 	prompt := promptui.Prompt{
-		Label:    "Assignee ",
+		Label:    fmt.Sprintf("%s ", label),
 		Validate: validate,
-		Default:  "me",
+		Default:  defaultValue,
+	}
+
+	result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return "", err
+	}
+	return result, nil
+}
+
+// PromptInput ... Prompts user for an assignee and returns a best guess at an assigneeID
+func PromptInputHidden(label, defaultValue, mask string) (string, error) {
+
+	validate := func(input string) error {
+		if len(input) < 4 && input != "me" {
+			return errors.New("too short for easy identification, please type more")
+		}
+		return nil
+	}
+
+	prompt := promptui.Prompt{
+		Label:    fmt.Sprintf("%s ", label),
+		Validate: validate,
+		Default:  defaultValue,
+		Mask:     0x2318,
 	}
 
 	result, err := prompt.Run()

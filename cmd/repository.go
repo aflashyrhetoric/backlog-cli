@@ -12,17 +12,18 @@ import (
 )
 
 // GetCurrentRepo .. Returns current repository
-func GetCurrentRepo() *git.Repository {
+func GetCurrentRepo() (*git.Repository, error) {
 	var path string
 	path, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
+		return nil, err
 	}
 
 	repo, err := git.PlainOpen(path)
 	ErrorCheck(err)
 
-	return repo
+	return repo, nil
 }
 
 // GetCurrentRepositoryName ... returns current repository name
@@ -48,13 +49,8 @@ func GetCurrentRepositoryName() string {
 
 // GetCurrentBranch .. Gets current branch name.
 func GetCurrentBranch() string {
-	var path string
-	path, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	repo, err := git.PlainOpen(path)
+	repo, err := GetCurrentRepo()
 	ErrorCheck(err)
 
 	branchName, err := repo.Head()
@@ -68,13 +64,8 @@ func GetCurrentBranch() string {
 
 // CheckIfBacklogRepo ... checks if the current repository is for Backlog (or other, e.g Github)
 func CheckIfBacklogRepo() {
-	var path string
-	path, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	repo, err := git.PlainOpen(path)
+	repo, err := GetCurrentRepo()
 	ErrorCheck(err)
 
 	// branchName, err := repo.Head()
