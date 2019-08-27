@@ -61,11 +61,11 @@ func PromptInputHidden(label, defaultValue, mask string) (string, error) {
 }
 
 // PromptConfirm ... Prompts user for a y/n question
-func PromptConfirm(message string) (bool, error) {
+func PromptConfirm(label, message string) (bool, error) {
 	fmt.Println(message)
 
 	prompt := promptui.Prompt{
-		Label:     "Assignee ",
+		Label:     label,
 		IsConfirm: true,
 		Default:   "n",
 	}

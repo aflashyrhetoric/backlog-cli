@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"strings"
 
+	a "github.com/logrusorgru/aurora"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
@@ -41,8 +42,10 @@ type Config struct {
 // InitialSetup ... receives prompts from the user to set up backlog-config.yaml
 func InitialSetup() {
 
+	fmt.Printf("%s", a.Bold("\n\nBacklog CLI has not yet been initialized. Please setup below...\n\n"))
+
 	// First, need BASEURL
-	baseURL, err := PromptInput("Enter BaseURL", "https://yourspace.backlog.com")
+	baseURL, err := PromptInput("Enter BaseURL (eg: 'https://yourexample.backlog.com') ", "https://yourspace.backlog.com")
 
 	// Remove whitespace and trailing slash
 	baseURL = strings.TrimSpace(baseURL)
@@ -54,7 +57,7 @@ func InitialSetup() {
 	ErrorCheck(err)
 	apiKey = strings.TrimSpace(apiKey)
 
-	debugMode, err := PromptConfirm("Enable debug/developer mode for more developer information?")
+	debugMode, err := PromptConfirm("Enable debugging?", "Enable debug/developer mode for more developer information?")
 	ErrorCheck(err)
 
 	// Get home directory
