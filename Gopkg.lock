@@ -201,6 +201,14 @@
   version = "v0.0.8"
 
 [[projects]]
+  digest = "1:0356f3312c9bd1cbeda81505b7fd437501d8e778ab66998ef69f00d7f9b3a0d7"
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3ee7d812e62a0804a7d0a324e0249ca2db3476d3"
+  version = "v0.0.4"
+
+[[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
@@ -228,6 +236,14 @@
   pruneopts = "UT"
   revision = "3c6ee9071cf061f4b0101e14412f74d6e7a8ada6"
   version = "v2.0.0"
+
+[[projects]]
+  digest = "1:abcdbf03ca6ca13d3697e2186edc1f33863bbdac2b3a44dfa39015e8903f7409"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e6d60cf7ba1f42d86d54cdf5508611c4aafb3970"
+  version = "v0.0.1"
 
 [[projects]]
   digest = "1:b2ee62e09bec113cf086d2ce0769efcc7bf79481aba8373fd8f7884e94df3462"
@@ -501,6 +517,7 @@
     "github.com/kyokomi/emoji",
     "github.com/logrusorgru/aurora",
     "github.com/manifoldco/promptui",
+    "github.com/olekukonko/tablewriter",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "gopkg.in/src-d/go-git.v4",

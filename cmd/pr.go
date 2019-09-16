@@ -55,9 +55,7 @@ var prCreateCmd = &cobra.Command{
 		r := GlobalConfig.RepositoryName
 		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		//apiURL = "test"
 		endpoint := Endpoint(apiURL)
-
 		existingPRs, err := checkForExistingPullRequests(endpoint)
 
 		if len(existingPRs) > 0 {
@@ -81,16 +79,24 @@ var prCreateCmd = &cobra.Command{
 			e.Printf("Creating PR: %s --> %s branch. :zap: \n", cb, BaseBranch)
 		}
 
+		// Truncate description if needed
+		description := GlobalConfig.CurrentIssue.Description
+		if len(description) > 300 {
+			description = GlobalConfig.CurrentIssue.Description[:300]
+		}
+
 		// Create the form, request, and send the POST request
 		// ---------------------------------------------------------
 		form := url.Values{}
 		form.Add("summary", Truncate(GlobalConfig.CurrentIssue.Summary))
-		form.Add("description", GlobalConfig.CurrentIssue.Description)
+		form.Add("description", description)
 		// Branch to merge to
 		form.Add("base", BaseBranch)
 		// Branch of branch we are merging
 		form.Add("branch", cb)
 		form.Add("assigneeId", strconv.Itoa(GlobalConfig.User.ID))
+
+		fmt.Println(form)
 
 		// Add issueID if it exists
 		if GlobalConfig.CurrentIssue.ID != 0 {
@@ -98,7 +104,9 @@ var prCreateCmd = &cobra.Command{
 		}
 
 		responseData, err := utils.Post(endpoint, form)
-		ErrorPanic(err)
+		if err != nil {
+			fmt.Printf("#%v", err)
+		}
 
 		var returnedPullRequest PullRequest
 		json.Unmarshal(responseData, &returnedPullRequest)
@@ -119,7 +127,6 @@ var prOpenCmd = &cobra.Command{
 		r := GlobalConfig.RepositoryName
 		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		//apiURL = "test"
 		endpoint := Endpoint(apiURL)
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
@@ -139,12 +146,10 @@ var prListCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// ---------------------------------------------------------
-
 		p := GlobalConfig.ProjectKey
 		r := GlobalConfig.RepositoryName
 		apiURL := "/api/v2/projects/" + p + "/git/repositories/" + r + "/pullRequests"
 
-		//apiURL = "test"
 		endpoint := Endpoint(apiURL)
 
 		existingPRs, err := checkForExistingPullRequests(endpoint)
